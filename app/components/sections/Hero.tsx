@@ -78,51 +78,51 @@ export default function Hero() {
         />
       </div>
 
-      {/* Floating Can Images - More Subtle */}
+      {/* Floating Can Images - Gold Luxury Cans */}
       <motion.div
-        className="absolute left-[8%] top-[15%] w-24 md:w-40 z-0 opacity-15"
+        className="absolute left-[8%] top-[15%] w-32 md:w-48 z-0 opacity-20"
         variants={canVariants}
         initial="hidden"
         animate={['visible', 'float']}
       >
         <Image
-          src="/Logo1.png"
-          alt="Popup Tiny Bar Can"
-          width={200}
-          height={400}
-          className="drop-shadow-2xl"
+          src="/logo gold.png"
+          alt="Popup Tiny Bar Premium Can"
+          width={300}
+          height={600}
+          className="drop-shadow-2xl filter brightness-110"
         />
       </motion.div>
 
       <motion.div
-        className="absolute right-[8%] top-[20%] w-24 md:w-40 z-0 opacity-15"
+        className="absolute right-[8%] top-[20%] w-32 md:w-48 z-0 opacity-20"
         variants={canVariants}
         initial="hidden"
         animate={['visible', 'float']}
         transition={{ delay: 0.3 }}
       >
         <Image
-          src="/Logo2.png"
-          alt="Popup Tiny Bar Can"
-          width={200}
-          height={400}
-          className="drop-shadow-2xl"
+          src="/logo gold2.png"
+          alt="Popup Tiny Bar Premium Can"
+          width={300}
+          height={600}
+          className="drop-shadow-2xl filter brightness-110"
         />
       </motion.div>
 
       <motion.div
-        className="absolute left-[10%] bottom-[15%] w-20 md:w-32 z-0 opacity-10"
+        className="absolute left-[10%] bottom-[15%] w-24 md:w-40 z-0 opacity-15"
         variants={canVariants}
         initial="hidden"
         animate={['visible', 'float']}
         transition={{ delay: 0.6 }}
       >
         <Image
-          src="/Logo3.png"
-          alt="Popup Tiny Bar Can"
-          width={200}
-          height={400}
-          className="drop-shadow-2xl"
+          src="/logo gold.png"
+          alt="Popup Tiny Bar Premium Can"
+          width={300}
+          height={600}
+          className="drop-shadow-2xl filter brightness-110"
         />
       </motion.div>
 
@@ -185,7 +185,7 @@ export default function Hero() {
               href="#personalizar"
               className="group relative px-10 py-4 border-2 border-rich-gold text-champagne font-montserrat font-medium text-lg tracking-wider uppercase overflow-hidden transition-all duration-500 hover:text-deep-black"
             >
-              <span className="relative z-10">Diseña tu Lata</span>
+              <span className="relative z-10">Colección Exclusiva</span>
               <div className="absolute inset-0 bg-rich-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
             </Link>
 
@@ -194,7 +194,7 @@ export default function Hero() {
               href="#cotizador"
               className="group relative px-10 py-4 border-2 border-champagne/40 text-champagne/80 font-montserrat font-medium text-lg tracking-wider uppercase overflow-hidden transition-all duration-500 hover:border-copper hover:text-deep-black"
             >
-              <span className="relative z-10">Cotiza tu Evento</span>
+              <span className="relative z-10">Reserve su Experiencia</span>
               <div className="absolute inset-0 bg-copper transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
             </Link>
           </motion.div>

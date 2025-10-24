@@ -7,10 +7,9 @@ interface ServiceCard {
   id: string;
   title: string;
   description: string;
-  icon: string;
-  color: string;
-  gradient: string;
+  icon: React.ReactNode;
   features: string[];
+  priceFrom: string;
 }
 
 export default function ServiceSelector() {
@@ -18,226 +17,194 @@ export default function ServiceSelector() {
 
   const services: ServiceCard[] = [
     {
-      id: 'bar-movil',
-      title: 'Bar Móvil para tu Evento',
-      description: 'Llevamos la experiencia completa: barra premium, bartender profesional y cocktails de autor.',
-      icon: '🍸',
-      color: 'coral',
-      gradient: 'from-coral to-electric-purple',
-      features: ['Bartender profesional', 'Setup completo', 'Cocktails ilimitados', '4-6 horas de servicio'],
+      id: 'experiencia-completa',
+      title: 'Experiencia Completa',
+      description: 'Bartender profesional, barra de mixología artesanal y selección curada de destilados premium para su evento.',
+      icon: (
+        <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2h-4L6 8h12l-4-6z"/>
+          <path d="M6 8l1.5 13h9L18 8"/>
+          <line x1="12" y1="13" x2="12" y2="18"/>
+        </svg>
+      ),
+      features: ['Mixólogo certificado', 'Barra premium equipada', 'Servicio de 4-6 horas', 'Glassware de cristal'],
+      priceFrom: '35,000',
     },
     {
-      id: 'cocteles-personalizados',
-      title: 'Cocktails Personalizados',
-      description: 'Latas únicas con tu diseño, logo y receta. Perfectas para regalos y recuerdos memorables.',
-      icon: '🥫',
-      color: 'electric-purple',
-      gradient: 'from-electric-purple to-mint',
-      features: ['Diseño personalizado', 'Tu logo incluido', 'Desde 50 unidades', 'Entrega a domicilio'],
+      id: 'edicion-exclusiva',
+      title: 'Edición Exclusiva',
+      description: 'Latas personalizadas con su identidad de marca. Diseño artesanal, receta única y presentación impecable.',
+      icon: (
+        <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="8" y="2" width="8" height="20" rx="1"/>
+          <line x1="8" y1="8" x2="16" y2="8"/>
+          <line x1="8" y1="14" x2="16" y2="14"/>
+        </svg>
+      ),
+      features: ['Diseño personalizado', 'Logo y branding incluido', 'Pedido mínimo 50 unidades', 'Entrega coordinada'],
+      priceFrom: '12,500',
     },
     {
-      id: 'paquetes-premium',
-      title: 'Paquetes Especiales',
-      description: 'La experiencia completa: bar móvil + cocktails personalizados + extras VIP para eventos únicos.',
-      icon: '🎉',
-      color: 'mint',
-      gradient: 'from-mint to-coral',
-      features: ['Todo incluido', 'Estación de garnish', 'Menú impreso', 'Degustación previa'],
+      id: 'coleccion-privada',
+      title: 'Colección Privada',
+      description: 'La experiencia definitiva: bar móvil, cocktails personalizados y detalles VIP para ocasiones extraordinarias.',
+      icon: (
+        <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+          <circle cx="12" cy="12" r="2"/>
+        </svg>
+      ),
+      features: ['Servicio completo', 'Estación de garnish gourmet', 'Menú personalizado impreso', 'Degustación privada previa'],
+      priceFrom: '58,000',
     },
   ];
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
+    hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
       transition: {
-        delay: i * 0.2,
-        duration: 0.6,
-        ease: [0.6, -0.05, 0.01, 0.99] as const,
+        delay: i * 0.15,
+        duration: 0.8,
+        ease: [0.25, 0.4, 0.25, 1] as const,
       },
     }),
   };
 
-  const iconVariants = {
-    idle: { scale: 1, rotate: 0 },
-    hover: {
-      scale: 1.2,
-      rotate: [0, -10, 10, -10, 0],
-      transition: {
-        duration: 0.5,
-      },
-    },
-    tap: {
-      scale: 0.9,
-      rotate: 360,
-      transition: {
-        duration: 0.6,
-      },
-    },
-  };
-
   return (
-    <section id="servicios" className="py-20 px-6 bg-gradient-to-b from-background to-mint/5">
-      <div className="max-w-7xl mx-auto">
+    <section id="servicios" className="relative py-24 px-6 bg-pearl overflow-hidden">
+      {/* Subtle Background Pattern */}
+      <div 
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, #0a0a0a 1px, transparent 0)',
+          backgroundSize: '40px 40px',
+        }}
+      />
+
+      <div className="relative max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-deep-purple mb-4">
-            ¿Qué necesitas?
+          <h2 className="font-serif text-5xl md:text-6xl text-midnight-navy mb-6 font-light">
+            Nuestras Colecciones
           </h2>
-          <p className="text-xl text-deep-purple/70 max-w-2xl mx-auto">
-            Elige la experiencia perfecta para tu evento
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="h-px w-12 bg-rich-gold"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-rich-gold"></div>
+            <div className="h-px w-12 bg-rich-gold"></div>
+          </div>
+          <p className="text-midnight-navy/70 font-montserrat text-lg font-light max-w-2xl mx-auto leading-relaxed">
+            Experiencias artesanales diseñadas para eventos que permanecen en la memoria
           </p>
         </motion.div>
 
-        {/* Service Cards Grid */}
+        {/* Service Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {services.map((service, index) => (
             <motion.div
               key={service.id}
               custom={index}
-              variants={cardVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
+              variants={cardVariants}
               onHoverStart={() => setHoveredCard(service.id)}
               onHoverEnd={() => setHoveredCard(null)}
-              whileHover={{
-                y: -10,
-                rotateY: 5,
-                rotateX: 5,
-              }}
-              className="group relative bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
-              style={{
-                transformStyle: 'preserve-3d',
-                perspective: '1000px',
-              }}
+              whileHover={{ scale: 1.02 }}
+              className="group relative bg-midnight-navy/95 backdrop-blur-sm border border-rich-gold/20 hover:border-rich-gold/60 transition-all duration-500 overflow-hidden"
             >
-              {/* Animated Gradient Border */}
-              <motion.div
-                className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-                style={{
-                  padding: '2px',
-                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                  WebkitMaskComposite: 'xor',
-                  maskComposite: 'exclude',
-                }}
-              />
+              {/* Gold Shimmer Effect on Hover */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rich-gold/10 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              </div>
 
-              {/* Icon with Animation */}
-              <motion.div
-                className={`w-20 h-20 bg-${service.color}/10 rounded-2xl flex items-center justify-center mb-6`}
-                variants={iconVariants}
-                animate={hoveredCard === service.id ? 'hover' : 'idle'}
-                whileTap="tap"
-              >
-                <span className="text-5xl">{service.icon}</span>
-              </motion.div>
-
-              {/* Content */}
-              <h3 className="text-2xl font-bold text-deep-purple mb-4 font-serif">
-                {service.title}
-              </h3>
-              
-              <p className="text-deep-purple/70 mb-6">
-                {service.description}
-              </p>
-
-              {/* Features List */}
-              <ul className="space-y-2 mb-6">
-                {service.features.map((feature, i) => (
-                  <motion.li
-                    key={i}
-                    className="flex items-center gap-2 text-sm text-deep-purple/80"
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.2 + i * 0.1 }}
-                  >
-                    <span className={`text-${service.color}`}>✓</span>
-                    {feature}
-                  </motion.li>
-                ))}
-              </ul>
-
-              {/* CTA Link with Arrow Animation */}
-              <motion.a
-                href={`#${service.id}`}
-                className={`text-${service.color} font-bold group-hover:text-electric-purple transition-colors inline-flex items-center gap-2`}
-              >
-                Conoce más
-                <motion.span
-                  animate={{
-                    x: hoveredCard === service.id ? 5 : 0,
-                  }}
+              {/* Card Content */}
+              <div className="relative p-8 md:p-10">
+                {/* Icon */}
+                <motion.div
+                  className="text-rich-gold mb-6"
+                  animate={hoveredCard === service.id ? { scale: 1.05 } : { scale: 1 }}
                   transition={{ duration: 0.3 }}
                 >
-                  →
-                </motion.span>
-              </motion.a>
+                  {service.icon}
+                </motion.div>
 
-              {/* Fizz Particles on Hover */}
-              {hoveredCard === service.id && (
-                <>
-                  {[...Array(5)].map((_, i) => (
-                    <motion.div
+                {/* Title */}
+                <h3 className="font-serif text-2xl md:text-3xl text-champagne mb-4 font-light leading-tight">
+                  {service.title}
+                </h3>
+
+                {/* Price */}
+                <div className="mb-6">
+                  <p className="font-montserrat text-sm text-rich-gold/80 uppercase tracking-widest mb-1">
+                    Desde
+                  </p>
+                  <p className="font-bebas text-3xl text-rich-gold tracking-wide">
+                    ${service.priceFrom} <span className="text-xl text-champagne/60">MXN</span>
+                  </p>
+                </div>
+
+                {/* Description */}
+                <p className="text-champagne/80 font-montserrat text-sm font-light leading-relaxed mb-8" style={{ lineHeight: '1.8' }}>
+                  {service.description}
+                </p>
+
+                {/* Features */}
+                <ul className="space-y-3 mb-8">
+                  {service.features.map((feature, i) => (
+                    <motion.li
                       key={i}
-                      className={`absolute w-2 h-2 bg-${service.color}/40 rounded-full`}
-                      initial={{
-                        x: Math.random() * 200 - 100,
-                        y: 100,
-                        opacity: 0,
-                        scale: 0,
-                      }}
-                      animate={{
-                        y: -100,
-                        opacity: [0, 1, 0],
-                        scale: [0.5, 1, 0.5],
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        delay: i * 0.1,
-                        repeat: Infinity,
-                      }}
-                      style={{
-                        left: `${30 + i * 15}%`,
-                        bottom: 0,
-                      }}
-                    />
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      className="flex items-start gap-3 text-champagne/70 font-montserrat text-sm font-light"
+                    >
+                      <svg className="w-4 h-4 text-rich-gold mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      {feature}
+                    </motion.li>
                   ))}
-                </>
-              )}
+                </ul>
+
+                {/* CTA Button */}
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  className="group/btn flex items-center gap-2 text-rich-gold font-montserrat text-sm uppercase tracking-wider hover:text-champagne transition-colors duration-300"
+                >
+                  Consultar Disponibilidad
+                  <svg className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </motion.button>
+              </div>
+
+              {/* Bottom Gold Line */}
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rich-gold/50 to-transparent"></div>
             </motion.div>
           ))}
         </div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          className="text-center mt-16"
+        {/* Bottom Note */}
+        <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="text-center mt-16 text-midnight-navy/60 font-montserrat text-sm font-light italic"
         >
-          <p className="text-lg text-deep-purple/70 mb-6">
-            ¿No estás seguro cuál elegir?
-          </p>
-          <motion.a
-            href="#cotizador"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-coral via-electric-purple to-mint text-white font-bold text-lg rounded-full shadow-xl"
-            whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Usa nuestro Cotizador Inteligente
-          </motion.a>
-        </motion.div>
+          *Precios sujetos a disponibilidad y personalización. Cotizaciones personalizadas disponibles.
+        </motion.p>
       </div>
     </section>
   );
 }
-
