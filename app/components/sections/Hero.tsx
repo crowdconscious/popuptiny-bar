@@ -2,37 +2,37 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Hero() {
   const textVariants = {
-    hidden: { opacity: 0, y: 50 },
+    hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
       transition: {
-        delay: i * 0.2,
-        duration: 0.8,
-        ease: [0.6, -0.05, 0.01, 0.99] as const,
+        delay: i * 0.15,
+        duration: 1,
+        ease: [0.25, 0.4, 0.25, 1] as const,
       },
     }),
   };
 
   const canVariants = {
-    hidden: { opacity: 0, scale: 0.5, rotate: -20 },
+    hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,
       scale: 1,
-      rotate: 0,
       transition: {
-        duration: 1,
+        duration: 1.2,
         ease: 'easeOut' as const,
       },
     },
     float: {
-      y: [0, -20, 0],
-      rotate: [0, 5, 0, -5, 0],
+      y: [0, -15, 0],
+      rotate: [0, 2, 0, -2, 0],
       transition: {
-        duration: 6,
+        duration: 8,
         repeat: Infinity,
         ease: 'easeInOut' as const,
       },
@@ -40,52 +40,47 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6 py-20 bg-gradient-to-br from-background via-coral/5 to-electric-purple/5">
-      {/* Animated Background Blobs */}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-luxury-gradient">
+      {/* Film Grain Overlay - Enhanced */}
+      <div 
+        className="absolute inset-0 opacity-20 pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          mixBlendMode: 'overlay',
+        }}
+      />
+
+      {/* Subtle Gold Glow Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-20 left-10 w-32 h-32 bg-coral/20 rounded-full blur-3xl"
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-rich-gold/5 rounded-full blur-[120px]"
           animate={{
-            y: [0, -30, 0],
             scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
           }}
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: 'easeInOut' as const,
           }}
         />
         <motion.div
-          className="absolute bottom-20 right-10 w-40 h-40 bg-electric-purple/20 rounded-full blur-3xl"
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-copper/5 rounded-full blur-[120px]"
           animate={{
-            y: [0, 30, 0],
-            scale: [1, 1.1, 1],
+            scale: [1.2, 1, 1.2],
+            opacity: [0.5, 0.3, 0.5],
           }}
           transition={{
             duration: 10,
             repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 1,
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-mint/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 2,
+            ease: 'easeInOut' as const,
           }}
         />
       </div>
 
-      {/* Floating Can Images */}
+      {/* Floating Can Images - More Subtle */}
       <motion.div
-        className="absolute left-[5%] top-[20%] w-32 md:w-48 z-0 opacity-30"
+        className="absolute left-[8%] top-[15%] w-24 md:w-40 z-0 opacity-15"
         variants={canVariants}
         initial="hidden"
         animate={['visible', 'float']}
@@ -100,11 +95,11 @@ export default function Hero() {
       </motion.div>
 
       <motion.div
-        className="absolute right-[5%] top-[25%] w-32 md:w-48 z-0 opacity-30"
+        className="absolute right-[8%] top-[20%] w-24 md:w-40 z-0 opacity-15"
         variants={canVariants}
         initial="hidden"
         animate={['visible', 'float']}
-        style={{ animationDelay: '1s' }}
+        transition={{ delay: 0.3 }}
       >
         <Image
           src="/Logo2.png"
@@ -116,11 +111,11 @@ export default function Hero() {
       </motion.div>
 
       <motion.div
-        className="absolute left-[15%] bottom-[15%] w-24 md:w-40 z-0 opacity-20"
+        className="absolute left-[10%] bottom-[15%] w-20 md:w-32 z-0 opacity-10"
         variants={canVariants}
         initial="hidden"
         animate={['visible', 'float']}
-        style={{ animationDelay: '2s' }}
+        transition={{ delay: 0.6 }}
       >
         <Image
           src="/Logo3.png"
@@ -131,156 +126,103 @@ export default function Hero() {
         />
       </motion.div>
 
-      {/* Fourth floating can - center */}
-      <motion.div
-        className="absolute right-[20%] bottom-[20%] w-28 md:w-44 z-0 opacity-25"
-        variants={canVariants}
-        initial="hidden"
-        animate={['visible', 'float']}
-        style={{ animationDelay: '3s' }}
-      >
-        <Image
-          src="/Logo2.png"
-          alt="Popup Tiny Bar Can"
-          width={200}
-          height={400}
-          className="drop-shadow-2xl"
-        />
-      </motion.div>
-
       {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto text-center">
-        {/* Animated Logo/Brand Name */}
-        <div className="mb-8">
+      <div className="relative z-10 max-w-6xl mx-auto text-center px-6">
+        <motion.div
+          className="space-y-6 md:space-y-8"
+          initial="hidden"
+          animate="visible"
+        >
+          {/* Main Title - Tracked */}
           <motion.h1
-            className="font-serif text-6xl md:text-8xl lg:text-9xl font-bold text-deep-purple tracking-tight"
             custom={0}
             variants={textVariants}
-            initial="hidden"
-            animate="visible"
+            className="text-tracked font-accent text-6xl md:text-8xl lg:text-9xl text-champagne tracking-[0.3em] font-normal"
           >
-            Popup
+            POPUP
           </motion.h1>
-          <motion.h1
-            className="font-serif text-6xl md:text-8xl lg:text-9xl font-bold text-coral tracking-tight -mt-4"
+
+          {/* Subtitle - Elegant Serif */}
+          <motion.div
             custom={1}
             variants={textVariants}
-            initial="hidden"
-            animate="visible"
+            className="font-serif text-3xl md:text-5xl lg:text-6xl text-rich-gold font-light italic tracking-wide"
           >
             Tiny Bar
-          </motion.h1>
-        </div>
+          </motion.div>
 
-        {/* Animated Tagline */}
-        <div className="mb-12 space-y-4">
-          <motion.p
-            className="text-2xl md:text-4xl font-bold text-deep-purple"
+          {/* Divider Line */}
+          <motion.div
             custom={2}
             variants={textVariants}
-            initial="hidden"
-            animate="visible"
+            className="flex items-center justify-center gap-4 py-4"
           >
-            Cocktails de autor.
-          </motion.p>
+            <div className="h-px w-12 md:w-20 bg-gradient-to-r from-transparent to-rich-gold"></div>
+            <div className="w-2 h-2 rounded-full bg-rich-gold animate-pulse"></div>
+            <div className="h-px w-12 md:w-20 bg-gradient-to-l from-transparent to-rich-gold"></div>
+          </motion.div>
+
+          {/* Tagline */}
           <motion.p
-            className="text-2xl md:text-4xl font-bold text-electric-purple"
             custom={3}
             variants={textVariants}
-            initial="hidden"
-            animate="visible"
+            className="font-serif text-xl md:text-2xl lg:text-3xl text-champagne/90 max-w-3xl mx-auto leading-relaxed font-light"
           >
-            En lata.
+            Experiencias líquidas de autor
+            <br className="hidden md:block" />
+            <span className="text-rich-gold italic"> enlatadas al momento </span>
+            para tus eventos
           </motion.p>
-          <motion.p
-            className="text-2xl md:text-4xl font-bold text-mint"
+
+          {/* CTA Buttons */}
+          <motion.div
             custom={4}
             variants={textVariants}
-            initial="hidden"
-            animate="visible"
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8"
           >
-            En tu evento.
-          </motion.p>
-        </div>
+            {/* Primary Ghost Button */}
+            <Link
+              href="#personalizar"
+              className="group relative px-10 py-4 border-2 border-rich-gold text-champagne font-montserrat font-medium text-lg tracking-wider uppercase overflow-hidden transition-all duration-500 hover:text-deep-black"
+            >
+              <span className="relative z-10">Diseña tu Lata</span>
+              <div className="absolute inset-0 bg-rich-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+            </Link>
 
-        {/* Description */}
-        <motion.p
-          className="text-lg md:text-xl text-deep-purple/80 max-w-2xl mx-auto mb-12"
-          custom={5}
-          variants={textVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          Bar móvil premium con cocktails artesanales personalizados para bodas, eventos corporativos y celebraciones únicas.
-        </motion.p>
+            {/* Secondary Ghost Button */}
+            <Link
+              href="#cotizador"
+              className="group relative px-10 py-4 border-2 border-champagne/40 text-champagne/80 font-montserrat font-medium text-lg tracking-wider uppercase overflow-hidden transition-all duration-500 hover:border-copper hover:text-deep-black"
+            >
+              <span className="relative z-10">Cotiza tu Evento</span>
+              <div className="absolute inset-0 bg-copper transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+            </Link>
+          </motion.div>
 
-        {/* CTA Buttons with Liquid Fill Effect */}
-        <motion.div
-          className="flex flex-col sm:flex-row gap-6 justify-center items-center"
-          custom={6}
-          variants={textVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.a
-            href="#servicios"
-            className="group relative px-8 py-4 bg-coral text-white font-bold text-lg rounded-full overflow-hidden"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          {/* Scroll Indicator */}
+          <motion.div
+            custom={5}
+            variants={textVariants}
+            className="pt-12 md:pt-16"
           >
-            <span className="relative z-10">Diseña tu Evento</span>
-            <motion.div
-              className="absolute inset-0 bg-electric-purple origin-left"
-              initial={{ scaleX: 0 }}
-              whileHover={{ scaleX: 1 }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.a>
-
-          <motion.a
-            href="#cocteles"
-            className="group relative px-8 py-4 bg-transparent border-2 border-deep-purple text-deep-purple font-bold text-lg rounded-full overflow-hidden"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span className="relative z-10 group-hover:text-white transition-colors">Ver Cocktails</span>
-            <motion.div
-              className="absolute inset-0 bg-deep-purple"
-              initial={{ scaleX: 0 }}
-              whileHover={{ scaleX: 1 }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.a>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-          animate={{
-            y: [0, 10, 0],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        >
-          <div className="w-6 h-10 border-2 border-deep-purple/30 rounded-full flex items-start justify-center p-2">
-            <motion.div
-              className="w-1 h-2 bg-deep-purple/50 rounded-full"
-              animate={{
-                y: [0, 12, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
-          </div>
+            <div className="flex flex-col items-center gap-3 text-champagne/50">
+              <p className="text-sm uppercase tracking-widest font-montserrat font-light">Descubre más</p>
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut' as const,
+                }}
+                className="w-px h-16 bg-gradient-to-b from-rich-gold/50 to-transparent"
+              />
+            </div>
+          </motion.div>
         </motion.div>
       </div>
+
+      {/* Bottom Gold Accent Line */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rich-gold/30 to-transparent"></div>
     </section>
   );
 }
-
