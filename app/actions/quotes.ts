@@ -34,12 +34,13 @@ export async function saveQuote(data: SaveQuoteData) {
       .from('customers')
       .select('id')
       .eq('email', data.customerEmail)
-      .maybeSingle() as { data: { id: string } | null; error: any };
+      .maybeSingle();
 
-    let customerId = existingCustomer?.id;
+    let customerId: string | undefined = existingCustomer?.id;
 
     // If customer doesn't exist, create one
     if (!customerId && !customerCheckError) {
+      // @ts-ignore - Supabase type inference issue
       const { data: newCustomer, error: customerCreateError } = await supabase
         .from('customers')
         .insert({
