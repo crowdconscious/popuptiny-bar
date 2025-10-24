@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Hero() {
@@ -16,27 +15,6 @@ export default function Hero() {
         ease: [0.25, 0.4, 0.25, 1] as const,
       },
     }),
-  };
-
-  const canVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 1.2,
-        ease: 'easeOut' as const,
-      },
-    },
-    float: {
-      y: [0, -15, 0],
-      rotate: [0, 2, 0, -2, 0],
-      transition: {
-        duration: 8,
-        repeat: Infinity,
-        ease: 'easeInOut' as const,
-      },
-    },
   };
 
   return (
@@ -77,54 +55,6 @@ export default function Hero() {
           }}
         />
       </div>
-
-      {/* Floating Can Images - Gold Luxury Cans */}
-      <motion.div
-        className="absolute left-[8%] top-[15%] w-32 md:w-48 z-0 opacity-20"
-        variants={canVariants}
-        initial="hidden"
-        animate={['visible', 'float']}
-      >
-        <Image
-          src="/logo gold.png"
-          alt="Popup Tiny Bar Premium Can"
-          width={300}
-          height={600}
-          className="drop-shadow-2xl filter brightness-110"
-        />
-      </motion.div>
-
-      <motion.div
-        className="absolute right-[8%] top-[20%] w-32 md:w-48 z-0 opacity-20"
-        variants={canVariants}
-        initial="hidden"
-        animate={['visible', 'float']}
-        transition={{ delay: 0.3 }}
-      >
-        <Image
-          src="/logo gold2.png"
-          alt="Popup Tiny Bar Premium Can"
-          width={300}
-          height={600}
-          className="drop-shadow-2xl filter brightness-110"
-        />
-      </motion.div>
-
-      <motion.div
-        className="absolute left-[10%] bottom-[15%] w-24 md:w-40 z-0 opacity-15"
-        variants={canVariants}
-        initial="hidden"
-        animate={['visible', 'float']}
-        transition={{ delay: 0.6 }}
-      >
-        <Image
-          src="/logo gold.png"
-          alt="Popup Tiny Bar Premium Can"
-          width={300}
-          height={600}
-          className="drop-shadow-2xl filter brightness-110"
-        />
-      </motion.div>
 
       {/* Main Content */}
       <div className="relative z-10 max-w-6xl mx-auto text-center px-6">
