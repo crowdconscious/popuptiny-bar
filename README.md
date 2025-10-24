@@ -1,36 +1,161 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍸 Popup Tiny Bar
 
-## Getting Started
+Premium mobile cocktail bar service in Mexico featuring custom-branded canned craft cocktails for high-end events.
 
-First, run the development server:
+## ✨ Features
+
+- 🎨 **Interactive Can Customizer** - Upload logos and customize labels
+- 💰 **Smart Quote Calculator** - AI-powered pricing for events
+- 📱 **Mobile-Optimized** - Beautiful responsive design
+- 🌐 **Bilingual** - Spanish/English content for premium market
+- 🎭 **3D Animations** - Framer Motion powered interactions
+- 🥫 **Transparent PET Cans** - Eco-friendly, customizable packaging
+
+## 🚀 Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Styling:** Tailwind CSS v4
+- **Animations:** Framer Motion
+- **Database:** Supabase
+- **Language:** TypeScript
+- **Fonts:** Inter & Playfair Display
+
+## 📦 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- Supabase account (for database)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env.local
+
+# Add your environment variables to .env.local:
+# NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+# NEXT_PUBLIC_WHATSAPP_NUMBER=5215512345678
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Run development server
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Access at http://localhost:3000
+```
 
-## Learn More
+## 🗂️ Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+popup-tiny-bar/
+├── app/
+│   ├── components/
+│   │   ├── sections/      # Hero, Navigation, Services
+│   │   ├── interactive/   # Quote Calculator, Can Customizer
+│   │   └── ui/           # WhatsApp Button, etc.
+│   ├── cocteles/         # Cocktail menu page
+│   ├── galeria/          # Event gallery
+│   ├── nosotros/         # About us
+│   └── admin/            # Admin dashboard
+├── lib/
+│   ├── supabase.ts       # Supabase client
+│   └── pricing-calculator.ts  # Quote logic
+└── public/
+    ├── can.png           # Can image for customizer
+    └── Logo*.png         # Brand assets
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Key Components
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Can Customizer
+Interactive label designer with logo upload and real-time preview
 
-## Deploy on Vercel
+### Quote Calculator
+6-step wizard for event quotes:
+1. Event type selection
+2. Guest count
+3. Cocktail style
+4. Service level
+5. Extras & add-ons
+6. Final quote with WhatsApp CTA
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Pricing Logic
+Industry-standard pricing with:
+- Base costs by event type
+- Per-person rates
+- Volume discounts (10-30%)
+- Premium add-ons
+- Service level multipliers
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌐 Deployment
+
+### Deploy to Vercel
+
+1. Push code to GitHub
+2. Import repository in Vercel
+3. Add environment variables
+4. Deploy!
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/popup-tiny-bar)
+
+### Environment Variables
+
+Required for production:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_WHATSAPP_NUMBER`
+
+## 📊 Database Setup
+
+Run the Supabase schema:
+
+```bash
+# See supabase-schema.sql for database setup
+```
+
+Tables:
+- `quotes` - Customer quote requests
+- `bookings` - Confirmed events
+- `customers` - Client information
+- `cocktails` - Menu items
+- `events` - Completed events
+- `custom_cans` - Label designs
+
+## 🎯 Features Roadmap
+
+- [x] Homepage with hero section
+- [x] Quote calculator
+- [x] Can customizer
+- [x] WhatsApp integration
+- [ ] Email notifications
+- [ ] Instagram feed integration
+- [ ] Online payments (Stripe)
+- [ ] Customer dashboard
+- [ ] Admin analytics
+
+## 📱 Mobile Testing
+
+Access on mobile devices via:
+```
+http://[your-local-ip]:3000
+```
+
+## 🤝 Contributing
+
+This is a private project for Popup Tiny Bar.
+
+## 📄 License
+
+All rights reserved - Popup Tiny Bar © 2024
+
+---
+
+Built with ❤️ for unforgettable events in Mexico 🇲🇽
