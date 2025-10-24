@@ -25,7 +25,7 @@ export default function Hero() {
       rotate: 0,
       transition: {
         duration: 1,
-        ease: 'easeOut',
+        ease: 'easeOut' as const,
       },
     },
     float: {
