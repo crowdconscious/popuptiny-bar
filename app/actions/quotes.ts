@@ -30,6 +30,7 @@ export interface SaveQuoteData {
 export async function saveQuote(data: SaveQuoteData) {
   try {
     // 1. First, check if customer exists or create new one
+    // @ts-ignore - Supabase type inference issue
     const { data: existingCustomer, error: customerCheckError } = await supabase
       .from('customers')
       .select('id')
