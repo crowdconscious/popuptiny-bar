@@ -54,7 +54,7 @@ export default function ServiceSelector() {
       transition: {
         delay: i * 0.2,
         duration: 0.6,
-        ease: [0.6, -0.05, 0.01, 0.99],
+        ease: [0.6, -0.05, 0.01, 0.99] as const,
       },
     }),
   };

@@ -24,7 +24,7 @@ Premium mobile cocktail bar service in Mexico featuring custom-branded canned cr
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - Supabase account (for database)
 
@@ -76,10 +76,13 @@ popup-tiny-bar/
 ## 🎨 Key Components
 
 ### Can Customizer
+
 Interactive label designer with logo upload and real-time preview
 
 ### Quote Calculator
+
 6-step wizard for event quotes:
+
 1. Event type selection
 2. Guest count
 3. Cocktail style
@@ -88,7 +91,9 @@ Interactive label designer with logo upload and real-time preview
 6. Final quote with WhatsApp CTA
 
 ### Pricing Logic
+
 Industry-standard pricing with:
+
 - Base costs by event type
 - Per-person rates
 - Volume discounts (10-30%)
@@ -109,6 +114,7 @@ Industry-standard pricing with:
 ### Environment Variables
 
 Required for production:
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `NEXT_PUBLIC_WHATSAPP_NUMBER`
@@ -122,6 +128,7 @@ Run the Supabase schema:
 ```
 
 Tables:
+
 - `quotes` - Customer quote requests
 - `bookings` - Confirmed events
 - `customers` - Client information
@@ -144,6 +151,7 @@ Tables:
 ## 📱 Mobile Testing
 
 Access on mobile devices via:
+
 ```
 http://[your-local-ip]:3000
 ```
