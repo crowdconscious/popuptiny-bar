@@ -34,9 +34,9 @@ export async function saveQuote(data: SaveQuoteData) {
       .from('customers')
       .select('id')
       .eq('email', data.customerEmail)
-      .maybeSingle();
+      .maybeSingle() as { data: { id: string } | null; error: any };
 
-    let customerId = existingCustomer?.id as string | undefined;
+    let customerId = existingCustomer?.id;
 
     // If customer doesn't exist, create one
     if (!customerId && !customerCheckError) {
@@ -55,7 +55,7 @@ export async function saveQuote(data: SaveQuoteData) {
         return { success: false, error: 'Error al crear el cliente' };
       }
 
-      customerId = newCustomer.id;
+      customerId = newCustomer?.id;
     }
 
     // 2. Save the quote
