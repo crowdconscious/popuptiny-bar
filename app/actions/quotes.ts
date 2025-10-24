@@ -34,9 +34,9 @@ export async function saveQuote(data: SaveQuoteData) {
       .from('customers')
       .select('id')
       .eq('email', data.customerEmail)
-      .single();
+      .maybeSingle();
 
-    let customerId = existingCustomer?.id;
+    let customerId = existingCustomer?.id as string | undefined;
 
     // If customer doesn't exist, create one
     if (!customerId && !customerCheckError) {
