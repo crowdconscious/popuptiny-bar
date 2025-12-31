@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Navigation from '../components/sections/Navigation';
 import WhatsAppButton from '../components/ui/WhatsAppButton';
 import { useCart } from '../context/CartContext';
+import { hapticFeedback } from '../utils/haptics';
 
 type LabelType = 'default' | 'custom-text' | 'logo' | 'template';
 
@@ -70,6 +71,7 @@ export default function PersonalizarPage() {
   }
 
   const handleLabelTypeChange = (type: LabelType) => {
+    hapticFeedback.light();
     setCustomization(prev => ({
       ...prev,
       labelType: type,
@@ -238,58 +240,58 @@ export default function PersonalizarPage() {
             </div>
 
             {/* RIGHT: Customization Options */}
-            <div className="space-y-6">
+            <div className="space-y-4 lg:space-y-6 order-1 lg:order-2">
               {/* Label Type Selection */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-rich-gold/20">
-                <h3 className="text-xl font-serif font-bold text-deep-purple mb-4">
+              <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-lg border border-rich-gold/20">
+                <h3 className="text-lg lg:text-xl font-serif font-bold text-deep-purple mb-3 lg:mb-4">
                   Tipo de Etiqueta
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2 lg:gap-3">
                   <button
                     onClick={() => handleLabelTypeChange('default')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`p-3 lg:p-4 rounded-lg border-2 transition-all min-h-[80px] ${
                       customization.labelType === 'default'
                         ? 'border-rich-gold bg-rich-gold/10'
                         : 'border-gray-200 hover:border-rich-gold/50'
                     }`}
                   >
-                    <div className="font-bold text-deep-purple mb-1">Popit Default</div>
+                    <div className="font-bold text-sm lg:text-base text-deep-purple mb-1">Popit Default</div>
                     <div className="text-xs text-deep-purple/60">Sin costo extra</div>
                   </button>
                   
                   <button
                     onClick={() => handleLabelTypeChange('custom-text')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`p-3 lg:p-4 rounded-lg border-2 transition-all min-h-[80px] ${
                       customization.labelType === 'custom-text'
                         ? 'border-rich-gold bg-rich-gold/10'
                         : 'border-gray-200 hover:border-rich-gold/50'
                     }`}
                   >
-                    <div className="font-bold text-deep-purple mb-1">Texto Personalizado</div>
+                    <div className="font-bold text-sm lg:text-base text-deep-purple mb-1">Texto Personalizado</div>
                     <div className="text-xs text-deep-purple/60">+$20 MXN/lata</div>
                   </button>
                   
                   <button
                     onClick={() => handleLabelTypeChange('logo')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`p-3 lg:p-4 rounded-lg border-2 transition-all min-h-[80px] ${
                       customization.labelType === 'logo'
                         ? 'border-rich-gold bg-rich-gold/10'
                         : 'border-gray-200 hover:border-rich-gold/50'
                     }`}
                   >
-                    <div className="font-bold text-deep-purple mb-1">Logo/Design</div>
+                    <div className="font-bold text-sm lg:text-base text-deep-purple mb-1">Logo/Design</div>
                     <div className="text-xs text-deep-purple/60">+$30 MXN/lata</div>
                   </button>
                   
                   <button
                     onClick={() => handleLabelTypeChange('template')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
+                    className={`p-3 lg:p-4 rounded-lg border-2 transition-all min-h-[80px] ${
                       customization.labelType === 'template'
                         ? 'border-rich-gold bg-rich-gold/10'
                         : 'border-gray-200 hover:border-rich-gold/50'
                     }`}
                   >
-                    <div className="font-bold text-deep-purple mb-1">Plantillas</div>
+                    <div className="font-bold text-sm lg:text-base text-deep-purple mb-1">Plantillas</div>
                     <div className="text-xs text-deep-purple/60">+$20 MXN/lata</div>
                   </button>
                 </div>

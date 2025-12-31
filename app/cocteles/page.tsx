@@ -6,6 +6,10 @@ import Navigation from '../components/sections/Navigation';
 import WhatsAppButton from '../components/ui/WhatsAppButton';
 import { useCart } from '../context/CartContext';
 import Link from 'next/link';
+import SwipeableCard from '../components/mobile/SwipeableCard';
+import ImageZoom from '../components/mobile/ImageZoom';
+import WhatsAppShare from '../components/mobile/WhatsAppShare';
+import { hapticFeedback } from '../utils/haptics';
 
 interface Product {
   id: string;
@@ -255,6 +259,7 @@ export default function CoctelesPage() {
   const flavorOfMonth = PRODUCTS.find(p => p.isFlavorOfMonth);
 
   const handleAddSix = (product: Product) => {
+    hapticFeedback.success();
     addToCart({
       id: product.id,
       name: product.name,
@@ -369,17 +374,18 @@ export default function CoctelesPage() {
                 const isFlipped = flippedCard === product.id;
                 
                 return (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="relative group"
-                  >
-                    <div
-                      className="relative h-[500px] perspective-1000"
-                      onMouseEnter={() => setFlippedCard(product.id)}
-                      onMouseLeave={() => setFlippedCard(null)}
+                  <SwipeableCard key={product.id}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="relative group"
                     >
+                      <div
+                        className="relative h-[500px] perspective-1000 lg:h-[500px] md:h-[450px]"
+                        onMouseEnter={() => setFlippedCard(product.id)}
+                        onMouseLeave={() => setFlippedCard(null)}
+                        onTouchStart={() => setFlippedCard(flippedCard === product.id ? null : product.id)}
+                      >
                       {/* Card Front */}
                       <motion.div
                         className="absolute inset-0 bg-white rounded-2xl p-6 shadow-lg border-2 border-rich-gold/20 cursor-pointer backface-hidden"
@@ -392,28 +398,33 @@ export default function CoctelesPage() {
                       >
                         {/* Can Animation */}
                         <div className="relative h-48 flex items-center justify-center mb-4">
-                          <motion.div
-                            className="relative w-20 h-32"
-                            animate={{
-                              rotateY: [0, 15, -15, 0],
-                              rotateX: [0, 5, -5, 0],
-                            }}
-                            transition={{
-                              duration: 4,
-                              repeat: Infinity,
-                              ease: 'easeInOut',
-                            }}
+                          <ImageZoom
+                            src={`/images/products/${product.id}.jpg`}
+                            alt={product.name}
                           >
-                            <div
-                              className="w-full h-full rounded-t-lg rounded-b-sm shadow-lg"
-                              style={{ backgroundColor: product.color }}
+                            <motion.div
+                              className="relative w-20 h-32"
+                              animate={{
+                                rotateY: [0, 15, -15, 0],
+                                rotateX: [0, 5, -5, 0],
+                              }}
+                              transition={{
+                                duration: 4,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                              }}
                             >
-                              <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-b from-gray-300 to-gray-400 rounded-t-lg"></div>
-                              <div className="absolute top-3 left-2 right-2 bottom-2 flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-deep-black">POPIT</span>
+                              <div
+                                className="w-full h-full rounded-t-lg rounded-b-sm shadow-lg"
+                                style={{ backgroundColor: product.color }}
+                              >
+                                <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-b from-gray-300 to-gray-400 rounded-t-lg"></div>
+                                <div className="absolute top-3 left-2 right-2 bottom-2 flex items-center justify-center">
+                                  <span className="text-[10px] font-bold text-deep-black">POPIT</span>
+                                </div>
                               </div>
-                            </div>
-                          </motion.div>
+                            </motion.div>
+                          </ImageZoom>
                         </div>
 
                         {/* Badges */}
@@ -469,12 +480,22 @@ export default function CoctelesPage() {
                               </div>
                               <div className="text-xs text-deep-purple/60">por lata</div>
                             </div>
-                            <button
-                              onClick={() => handleAddSix(product)}
-                              className="px-4 py-2 bg-rich-gold text-deep-black font-bold rounded-full hover:bg-rich-gold/80 transition-colors text-sm"
-                            >
-                              +6
-                            </button>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleAddSix(product)}
+                                className="px-4 py-2 bg-rich-gold text-deep-black font-bold rounded-full hover:bg-rich-gold/80 transition-colors text-sm"
+                              >
+                                +6
+                              </button>
+                              <WhatsAppShare
+                                product={{
+                                  name: product.name,
+                                  price: product.price,
+                                  description: product.playfulDescription,
+                                }}
+                                className="hidden md:flex"
+                              />
+                            </div>
                           </div>
                         </div>
                       </motion.div>
@@ -540,16 +561,26 @@ export default function CoctelesPage() {
                             </div>
                           </div>
 
-                          <button
-                            onClick={() => handleAddSix(product)}
-                            className="w-full px-4 py-3 bg-rich-gold text-deep-black font-bold rounded-full hover:bg-rich-gold/80 transition-colors"
-                          >
-                            Agregar 6 Latas
-                          </button>
+                          <div className="flex flex-col gap-2">
+                            <button
+                              onClick={() => handleAddSix(product)}
+                              className="w-full px-4 py-3 bg-rich-gold text-deep-black font-bold rounded-full hover:bg-rich-gold/80 transition-colors"
+                            >
+                              Agregar 6 Latas
+                            </button>
+                            <WhatsAppShare
+                              product={{
+                                name: product.name,
+                                price: product.price,
+                                description: product.playfulDescription,
+                              }}
+                            />
+                          </div>
                         </div>
                       </motion.div>
                     </div>
-                  </motion.div>
+                    </motion.div>
+                  </SwipeableCard>
                 );
               })}
             </div>

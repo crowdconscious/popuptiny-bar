@@ -16,12 +16,14 @@ interface CartContextType {
   removeFromCart: (id: string) => void;
   clearCart: () => void;
   totalCans: number;
+  lastAddedItem: CartItem | null;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -43,6 +45,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
+      const newItem = { ...item, quantity: item.quantity || 1 };
+      
+      setLastAddedItem(newItem);
+      setTimeout(() => setLastAddedItem(null), 1000);
+      
       if (existingItem) {
         return prevCart.map((cartItem) =>
           cartItem.id === item.id
@@ -50,7 +57,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             : cartItem
         );
       }
-      return [...prevCart, { ...item, quantity: item.quantity || 1 }];
+      return [...prevCart, newItem];
     });
   };
 
@@ -87,6 +94,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         removeFromCart,
         clearCart,
         totalCans,
+        lastAddedItem,
       }}
     >
       {children}

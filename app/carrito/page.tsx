@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import Navigation from '../components/sections/Navigation';
 import WhatsAppButton from '../components/ui/WhatsAppButton';
 import { useCart } from '../context/CartContext';
+import PaymentButtons from '../components/mobile/PaymentButtons';
+import { hapticFeedback } from '../utils/haptics';
 
 interface DeliveryInfo {
   name: string;
@@ -436,9 +438,13 @@ export default function CarritoPage() {
                 >
                   Seguir Comprando
                 </button>
-                <button
-                  onClick={handleNext}
+                <motion.button
+                  onClick={() => {
+                    hapticFeedback.medium();
+                    handleNext();
+                  }}
                   disabled={totalCans < 6}
+                  whileTap={{ scale: 0.98 }}
                   className={`flex-1 px-6 py-3 rounded-lg font-bold transition-all ${
                     totalCans >= 6
                       ? 'bg-rich-gold text-deep-black hover:bg-rich-gold/80 shadow-lg hover:scale-105'
@@ -446,7 +452,7 @@ export default function CarritoPage() {
                   }`}
                 >
                   Continuar
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           )}
@@ -630,6 +636,31 @@ export default function CarritoPage() {
               <h2 className="text-3xl font-serif font-bold text-deep-purple mb-6">
                 Método de Pago
               </h2>
+
+              {/* Mobile Payment Buttons (Apple Pay / Google Pay) */}
+              <div className="mb-6 lg:hidden">
+                <PaymentButtons
+                  onApplePay={() => {
+                    hapticFeedback.success();
+                    setSelectedPayment('apple-pay');
+                    // Handle Apple Pay
+                  }}
+                  onGooglePay={() => {
+                    hapticFeedback.success();
+                    setSelectedPayment('google-pay');
+                    // Handle Google Pay
+                  }}
+                  amount={total}
+                />
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-rich-gold/20"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-deep-purple/60">O elige otro método</span>
+                  </div>
+                </div>
+              </div>
 
               <div className="space-y-3 mb-6">
                 {PAYMENT_METHODS.map((method) => (

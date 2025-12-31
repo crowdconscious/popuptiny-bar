@@ -213,3 +213,21 @@ body::before {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+
+/* Mobile Optimizations */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Prevent pull-to-refresh on iOS */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Touch-friendly tap targets */
+@media (max-width: 768px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

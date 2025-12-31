@@ -9,7 +9,8 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { scrollY } = useScroll();
-  const { totalCans } = useCart();
+  const { totalCans, lastAddedItem } = useCart();
+  const [shouldBounce, setShouldBounce] = useState(false);
   
   const logoScale = useTransform(scrollY, [0, 100], [1, 0.85]);
   const headerBg = useTransform(
@@ -25,6 +26,14 @@ export default function Navigation() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (lastAddedItem) {
+      setShouldBounce(true);
+      const timer = setTimeout(() => setShouldBounce(false), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [lastAddedItem]);
 
   const menuItems = [
     { name: 'Productos', href: '/productos' },
@@ -108,9 +117,16 @@ export default function Navigation() {
                 >
                   {item.name}
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className="absolute -top-2 -right-4 bg-rich-gold text-deep-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    <motion.span
+                      animate={shouldBounce && item.name === 'Mi Carrito' ? {
+                        scale: [1, 1.5, 1],
+                        rotate: [0, -10, 10, -10, 0],
+                      } : {}}
+                      transition={{ duration: 0.5 }}
+                      className="absolute -top-2 -right-4 bg-rich-gold text-deep-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                    >
                       {item.badge}
-                    </span>
+                    </motion.span>
                   )}
                   <span className="absolute -bottom-1 left-0 w-0 h-px bg-rich-gold group-hover:w-full transition-all duration-300"></span>
                 </Link>
@@ -201,9 +217,16 @@ export default function Navigation() {
                 >
                   {item.name}
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className="ml-3 inline-block bg-rich-gold text-deep-black text-sm font-bold rounded-full px-2 py-0.5">
+                    <motion.span
+                      animate={shouldBounce && item.name === 'Mi Carrito' ? {
+                        scale: [1, 1.3, 1],
+                        rotate: [0, -10, 10, -10, 0],
+                      } : {}}
+                      transition={{ duration: 0.5 }}
+                      className="ml-3 inline-block bg-rich-gold text-deep-black text-sm font-bold rounded-full px-2 py-0.5"
+                    >
                       {item.badge}
-                    </span>
+                    </motion.span>
                   )}
                 </Link>
               </motion.div>

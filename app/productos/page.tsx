@@ -8,6 +8,7 @@ import Navigation from '../components/sections/Navigation';
 import WhatsAppButton from '../components/ui/WhatsAppButton';
 import { useCart } from '../context/CartContext';
 import PackBuilder from './pack-builder';
+import PullToRefresh from '../components/mobile/PullToRefresh';
 
 interface Cocktail {
   id: string;
@@ -174,11 +175,17 @@ export default function ProductosPage() {
   };
 
 
+  const handleRefresh = async () => {
+    // Reload page data
+    window.location.reload();
+  };
+
   return (
     <>
       <Navigation />
       
-      <main className="min-h-screen bg-background pt-32">
+      <PullToRefresh onRefresh={handleRefresh}>
+        <main className="min-h-screen bg-background pt-32 pb-20">
         {/* Header */}
         <section className="py-12 px-6 bg-gradient-to-br from-rich-gold/10 via-background to-copper/10 border-b border-rich-gold/20">
           <div className="max-w-7xl mx-auto text-center">
@@ -526,7 +533,8 @@ export default function ProductosPage() {
             </motion.div>
           ))}
         </AnimatePresence>
-      </main>
+        </main>
+      </PullToRefresh>
 
       <WhatsAppButton />
     </>
