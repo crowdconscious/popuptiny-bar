@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Navigation from '../components/sections/Navigation';
 import WhatsAppButton from '../components/ui/WhatsAppButton';
 import { useCart } from '../context/CartContext';
+import PackBuilder from './pack-builder';
 
 interface Cocktail {
   id: string;
@@ -187,6 +188,13 @@ export default function ProductosPage() {
             <p className="text-xl text-deep-purple/70">
               Mínimo 6 latas • Mezcla como quieras • Entrega el mismo día
             </p>
+          </div>
+        </section>
+
+        {/* Pack Builder Section */}
+        <section className="py-12 px-6 bg-gradient-to-br from-rich-gold/5 to-copper/5">
+          <div className="max-w-7xl mx-auto mb-12">
+            <PackBuilder />
           </div>
         </section>
 
