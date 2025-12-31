@@ -28,10 +28,10 @@ export default function Navigation() {
 
   const menuItems = [
     { name: 'Productos', href: '/productos' },
-    { name: 'Personalizar', href: '#personalizar' },
+    { name: 'Personalizar', href: '/personalizar' },
     { name: 'Packs Especiales', href: '/productos#packs' },
     { name: 'Nosotros', href: '/nosotros' },
-    { name: 'Mi Carrito', href: '/productos', badge: totalCans },
+    { name: 'Mi Carrito', href: '/carrito', badge: totalCans },
   ];
 
   const menuVariants = {

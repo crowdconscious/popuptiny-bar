@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Navigation from '../components/sections/Navigation';
 import WhatsAppButton from '../components/ui/WhatsAppButton';
 import { useCart } from '../context/CartContext';
@@ -90,16 +92,41 @@ const FEATURED_PACKS = [
 ];
 
 export default function ProductosPage() {
+  const router = useRouter();
   const { cart, addToCart: addToCartContext, updateQuantity: updateQuantityContext, totalCans } = useCart();
-  const [customLabels, setCustomLabels] = useState(false);
   const [fizzAnimations, setFizzAnimations] = useState<number[]>([]);
   const [celebrating, setCelebrating] = useState(false);
   const [shaking, setShaking] = useState(false);
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = totalCans >= 24 ? 0 : 150;
-  const customLabelFee = customLabels ? totalCans * 15 : 0;
-  const total = subtotal + shipping + customLabelFee;
+  
+  // Check for saved customization
+  const [hasCustomization, setHasCustomization] = useState(false);
+  useEffect(() => {
+    const saved = localStorage.getItem('popit-customization');
+    setHasCustomization(!!saved);
+  }, []);
+  
+  const customizationCost = hasCustomization ? (() => {
+    try {
+      const custom = JSON.parse(localStorage.getItem('popit-customization') || '{}');
+      if (custom.labelType === 'default') return 0;
+      const cansToCustomize = custom.applyTo === 'all' 
+        ? totalCans 
+        : cart.find(item => item.id === custom.applyTo)?.quantity || 0;
+      if (custom.labelType === 'custom-text' || custom.labelType === 'template') {
+        return cansToCustomize * 20;
+      } else if (custom.labelType === 'logo') {
+        return cansToCustomize * 30;
+      }
+    } catch (e) {
+      return 0;
+    }
+    return 0;
+  })() : 0;
+  
+  const total = subtotal + shipping + customizationCost;
 
   const addToCart = (cocktail: Cocktail, quantity: number = 1) => {
     setShaking(true);
@@ -145,10 +172,6 @@ export default function ProductosPage() {
     });
   };
 
-  const handleContinue = () => {
-    const message = `¡Hola! Quiero armar mi pack de Popits:\n\n${cart.map(item => `• ${item.name}: ${item.quantity} latas`).join('\n')}\n\nTotal: $${total.toLocaleString('es-MX')} MXN\n\n${customLabels ? '✅ Quiero personalizar las etiquetas' : ''}`;
-    window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5215512345678'}?text=${encodeURIComponent(message)}`, '_blank');
-  };
 
   return (
     <>
@@ -371,24 +394,19 @@ export default function ProductosPage() {
                       </div>
                     )}
 
-                    {/* Custom Labels Toggle */}
+                    {/* Custom Labels Link */}
                     <div className="mb-6 p-4 bg-rich-gold/5 rounded-xl">
-                      <label className="flex items-center justify-between cursor-pointer">
+                      <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-bold text-deep-purple">
                           ¿Quieres personalizar las etiquetas?
                         </span>
-                        <input
-                          type="checkbox"
-                          checked={customLabels}
-                          onChange={(e) => setCustomLabels(e.target.checked)}
-                          className="w-5 h-5 rounded text-rich-gold focus:ring-rich-gold"
-                        />
-                      </label>
-                      {customLabels && (
-                        <p className="text-xs text-deep-purple/60 mt-2">
-                          +$15 MXN por lata
-                        </p>
-                      )}
+                      </div>
+                      <Link
+                        href="/personalizar"
+                        className="block w-full mt-3 px-4 py-2 bg-rich-gold/20 hover:bg-rich-gold/30 text-rich-gold font-bold rounded-lg transition-colors text-center text-sm"
+                      >
+                        Personalizar Etiquetas →
+                      </Link>
                     </div>
 
                     {/* Shipping Calculator */}
@@ -405,11 +423,11 @@ export default function ProductosPage() {
                           {shipping === 0 ? 'GRATIS' : `$${shipping.toLocaleString('es-MX')}`}
                         </span>
                       </div>
-                      {customLabelFee > 0 && (
+                      {customizationCost > 0 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-deep-purple/70">Personalización</span>
                           <span className="font-bold text-deep-purple">
-                            ${customLabelFee.toLocaleString('es-MX')}
+                            ${customizationCost.toLocaleString('es-MX')}
                           </span>
                         </div>
                       )}
@@ -423,7 +441,11 @@ export default function ProductosPage() {
 
                     {/* Continue Button */}
                     <button
-                      onClick={handleContinue}
+                      onClick={() => {
+                        if (totalCans >= 6) {
+                          router.push('/carrito');
+                        }
+                      }}
                       disabled={totalCans < 6}
                       className={`w-full py-4 rounded-full font-bold text-lg transition-all ${
                         totalCans >= 6
@@ -433,7 +455,7 @@ export default function ProductosPage() {
                     >
                       {totalCans < 6
                         ? `Agrega ${6 - totalCans} lata${6 - totalCans > 1 ? 's' : ''} más`
-                        : 'Continuar con WhatsApp'}
+                        : 'Ir al Carrito'}
                     </button>
                   </motion.div>
                 </div>
