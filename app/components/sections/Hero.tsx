@@ -10,8 +10,15 @@ export default function Hero() {
 
   const flavors = [
     { name: 'Margarita Clásica', image: '/images/popit1.png' },
-    { name: 'Mojito Premium', image: '/images/popit2.png' },
-    { name: 'Paloma Mexicana', image: '/images/popit3.png' },
+    { name: 'Mezcalita de Jamaica', image: '/images/popit2.png' },
+    { name: 'St. Germain Spritz', image: '/images/popit3.png' },
+  ];
+
+  // Create more floating cans by repeating the images
+  const floatingCans = [
+    ...flavors,
+    ...flavors,
+    ...flavors.slice(0, 2), // Add 2 more to make 8 total
   ];
 
   const textVariants = {
@@ -80,17 +87,22 @@ export default function Hero() {
       </div>
 
       {/* Floating Clickable Cans */}
-      {flavors.map((flavor, index) => {
+      {floatingCans.map((flavor, index) => {
         const positions = [
-          { top: '20%', left: '10%' },
-          { top: '50%', right: '12%' },
-          { top: '70%', left: '8%' },
+          { top: '15%', left: '8%' },
+          { top: '25%', right: '10%' },
+          { top: '40%', left: '5%' },
+          { top: '55%', right: '8%' },
+          { top: '70%', left: '12%' },
+          { top: '20%', right: '15%' },
+          { top: '65%', right: '18%' },
+          { top: '35%', left: '15%' },
         ];
         const pos = positions[index % positions.length];
 
         return (
           <motion.div
-            key={index}
+            key={`${flavor.image}-${index}`}
             className="absolute z-20 cursor-pointer"
             style={pos}
             custom={index}
@@ -103,7 +115,7 @@ export default function Hero() {
             <div className="relative">
               {/* Can Image */}
               <motion.div
-                className="relative w-20 h-28 md:w-24 md:h-32 transition-all duration-300"
+                className="relative w-28 h-40 md:w-36 md:h-48 lg:w-40 lg:h-52 transition-all duration-300"
                 animate={{
                   scale: hoveredCan === index ? 1.15 : 1,
                 }}
@@ -116,8 +128,8 @@ export default function Hero() {
                 <Image
                   src={flavor.image}
                   alt={flavor.name}
-                  width={96}
-                  height={128}
+                  width={160}
+                  height={208}
                   className="object-contain w-full h-full"
                   style={{
                     transform: hoveredCan === index ? 'rotate(5deg)' : 'rotate(0deg)',
