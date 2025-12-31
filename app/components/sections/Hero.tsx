@@ -2,8 +2,20 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Hero() {
+  const [hoveredCan, setHoveredCan] = useState<number | null>(null);
+
+  const flavors = [
+    { name: 'Margarita Clásica', color: '#f7e7ce' },
+    { name: 'Mojito Premium', color: '#a8e6cf' },
+    { name: 'Paloma Mexicana', color: '#ffd3b6' },
+    { name: 'Mezcal Sunrise', color: '#ffaaa5' },
+    { name: 'Old Fashioned', color: '#d4af37' },
+    { name: 'Mojito de Jamaica', color: '#c44569' },
+  ];
+
   const textVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
@@ -13,6 +25,19 @@ export default function Hero() {
         delay: i * 0.15,
         duration: 1,
         ease: [0.25, 0.4, 0.25, 1] as const,
+      },
+    }),
+  };
+
+  const canVariants = {
+    float: (i: number) => ({
+      y: [0, -20, 0],
+      x: [0, Math.sin(i) * 15, 0],
+      rotate: [0, Math.sin(i) * 5, 0],
+      transition: {
+        duration: 4 + i,
+        repeat: Infinity,
+        ease: 'easeInOut' as const,
       },
     }),
   };
@@ -56,6 +81,68 @@ export default function Hero() {
         />
       </div>
 
+      {/* Floating Clickable Cans */}
+      {flavors.map((flavor, index) => {
+        const positions = [
+          { top: '15%', left: '10%' },
+          { top: '25%', right: '15%' },
+          { top: '60%', left: '8%' },
+          { top: '70%', right: '12%' },
+          { top: '40%', left: '5%' },
+          { top: '50%', right: '8%' },
+        ];
+        const pos = positions[index % positions.length];
+
+        return (
+          <motion.div
+            key={index}
+            className="absolute z-20 cursor-pointer"
+            style={pos}
+            custom={index}
+            variants={canVariants}
+            animate="float"
+            onMouseEnter={() => setHoveredCan(index)}
+            onMouseLeave={() => setHoveredCan(null)}
+            onClick={() => window.location.href = '/cocteles'}
+          >
+            <div className="relative">
+              {/* Can Image/Shape */}
+              <div 
+                className="w-16 h-24 md:w-20 md:h-28 rounded-t-lg rounded-b-sm transition-all duration-300 shadow-lg"
+                style={{
+                  backgroundColor: flavor.color,
+                  border: hoveredCan === index ? '2px solid #d4af37' : '1px solid rgba(212, 175, 55, 0.3)',
+                  boxShadow: hoveredCan === index 
+                    ? '0 8px 32px rgba(212, 175, 55, 0.4), 0 0 0 2px rgba(212, 175, 55, 0.2)' 
+                    : '0 4px 16px rgba(0, 0, 0, 0.3)',
+                  transform: hoveredCan === index ? 'scale(1.15)' : 'scale(1)',
+                }}
+              >
+                {/* Can Top */}
+                <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-gray-300 to-gray-400 rounded-t-lg"></div>
+                {/* Can Label Area */}
+                <div className="absolute top-4 left-1 right-1 bottom-2 flex items-center justify-center">
+                  <span className="text-[8px] md:text-[10px] font-bold text-deep-black text-center px-1">
+                    POPIT
+                  </span>
+                </div>
+              </div>
+
+              {/* Flavor Tooltip */}
+              {hoveredCan === index && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-rich-gold text-deep-black text-xs font-bold rounded shadow-lg border border-rich-gold/50"
+                >
+                  {flavor.name}
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        );
+      })}
+
       {/* Main Content */}
       <div className="relative z-10 max-w-6xl mx-auto text-center px-6">
         <motion.div
@@ -63,23 +150,23 @@ export default function Hero() {
           initial="hidden"
           animate="visible"
         >
-          {/* Main Title - Tracked */}
-          <motion.h1
+          {/* Tagline - "popit here, popit there, popit anywhere" */}
+          <motion.p
             custom={0}
             variants={textVariants}
-            className="text-tracked font-accent text-6xl md:text-8xl lg:text-9xl text-champagne tracking-[0.3em] font-normal"
+            className="text-sm md:text-base text-rich-gold/70 font-montserrat tracking-[0.2em] uppercase"
           >
-            POPUP
-          </motion.h1>
+            popit here, popit there, popit anywhere
+          </motion.p>
 
-          {/* Subtitle - Elegant Serif */}
-          <motion.div
+          {/* Main Title */}
+          <motion.h1
             custom={1}
             variants={textVariants}
-            className="font-serif text-3xl md:text-5xl lg:text-6xl text-rich-gold font-light italic tracking-wide"
+            className="font-serif text-5xl md:text-7xl lg:text-8xl text-champagne font-bold leading-tight"
           >
-            Tiny Bar
-          </motion.div>
+            Popit: Cocteles Premium en Lata
+          </motion.h1>
 
           {/* Divider Line */}
           <motion.div
@@ -98,40 +185,68 @@ export default function Hero() {
             variants={textVariants}
             className="font-serif text-xl md:text-2xl lg:text-3xl text-champagne/90 max-w-3xl mx-auto leading-relaxed font-light"
           >
-            Experiencias líquidas de autor
-            <br className="hidden md:block" />
-            <span className="text-rich-gold italic"> enlatadas al momento </span>
-            para tus eventos
+            Entregamos la fiesta a tu puerta. Mínimo 6 latas.
           </motion.p>
 
-          {/* CTA Buttons */}
+          {/* Trust Badges */}
           <motion.div
             custom={4}
             variants={textVariants}
+            className="flex flex-wrap justify-center gap-4 md:gap-6 pt-4"
+          >
+            <div className="px-4 py-2 bg-rich-gold/10 border border-rich-gold/30 rounded-full text-champagne text-sm md:text-base font-montserrat backdrop-blur-sm shadow-lg">
+              ✨ Envío Gratis +24 latas
+            </div>
+            <div className="px-4 py-2 bg-rich-gold/10 border border-rich-gold/30 rounded-full text-champagne text-sm md:text-base font-montserrat backdrop-blur-sm shadow-lg">
+              🍋 Hecho fresco
+            </div>
+            <div className="px-4 py-2 bg-rich-gold/10 border border-rich-gold/30 rounded-full text-champagne text-sm md:text-base font-montserrat backdrop-blur-sm shadow-lg">
+              🚀 Entrega el mismo día
+            </div>
+          </motion.div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            custom={5}
+            variants={textVariants}
             className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8"
           >
-            {/* Primary Ghost Button */}
+            {/* Primary CTA */}
             <Link
               href="#personalizar"
-              className="group relative px-10 py-4 border-2 border-rich-gold text-champagne font-montserrat font-medium text-lg tracking-wider uppercase overflow-hidden transition-all duration-500 hover:text-deep-black"
+              className="group relative px-10 py-4 border-2 border-rich-gold text-champagne font-montserrat font-medium text-lg tracking-wider uppercase overflow-hidden transition-all duration-500 hover:text-deep-black shadow-lg hover:shadow-rich-gold/50"
             >
-              <span className="relative z-10">Colección Exclusiva</span>
+              <span className="relative z-10">Arma tu Pack</span>
               <div className="absolute inset-0 bg-rich-gold transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
             </Link>
 
-            {/* Secondary Ghost Button */}
+            {/* Secondary CTA */}
             <Link
-              href="#cotizador"
-              className="group relative px-10 py-4 border-2 border-champagne/40 text-champagne/80 font-montserrat font-medium text-lg tracking-wider uppercase overflow-hidden transition-all duration-500 hover:border-copper hover:text-deep-black"
+              href="/cocteles"
+              className="group relative px-10 py-4 border-2 border-champagne/40 text-champagne/80 font-montserrat font-medium text-lg tracking-wider uppercase overflow-hidden transition-all duration-500 hover:border-rich-gold hover:text-deep-black shadow-lg hover:shadow-rich-gold/30"
             >
-              <span className="relative z-10">Reserve su Experiencia</span>
-              <div className="absolute inset-0 bg-copper transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+              <span className="relative z-10">Ver Sabores</span>
+              <div className="absolute inset-0 bg-rich-gold/80 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
             </Link>
+          </motion.div>
+
+          {/* Discount Code */}
+          <motion.div
+            custom={6}
+            variants={textVariants}
+            className="pt-6"
+          >
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-rich-gold/20 border border-rich-gold/50 rounded-full backdrop-blur-sm shadow-lg">
+              <span className="text-champagne font-montserrat text-sm md:text-base">
+                ¿Primera vez? <span className="text-rich-gold font-bold">10% OFF</span> con código{' '}
+                <span className="text-rich-gold font-bold tracking-wider">Popiteverywhere</span>
+              </span>
+            </div>
           </motion.div>
 
           {/* Scroll Indicator */}
           <motion.div
-            custom={5}
+            custom={7}
             variants={textVariants}
             className="pt-12 md:pt-16"
           >
