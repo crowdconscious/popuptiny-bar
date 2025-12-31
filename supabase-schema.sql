@@ -1,4 +1,4 @@
--- Popup Tiny Bar - Supabase Database Schema
+-- Popup Tiny Bar - Supabase Database Schema (Updated for Canned Cocktails Business Model)
 -- Run this in your Supabase SQL Editor: https://app.supabase.com/project/_/sql
 
 -- Enable UUID extension
@@ -14,263 +14,200 @@ CREATE TABLE IF NOT EXISTS customers (
   name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
-  company TEXT,
+  delivery_address TEXT,
+  city TEXT DEFAULT 'CDMX',
+  postal_code TEXT,
   notes TEXT,
   CONSTRAINT customers_email_key UNIQUE (email)
 );
 
 -- ============================================
--- QUOTES TABLE
+-- PRODUCTS TABLE (renamed from cocktails)
 -- ============================================
-CREATE TABLE IF NOT EXISTS quotes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
-  -- Customer Info
-  customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
-  customer_name TEXT NOT NULL,
-  customer_email TEXT NOT NULL,
-  customer_phone TEXT NOT NULL,
-  
-  -- Event Details
-  event_type TEXT NOT NULL CHECK (event_type IN ('wedding', 'corporate', 'private', 'other')),
-  event_date DATE,
-  guest_count INTEGER NOT NULL CHECK (guest_count > 0),
-  venue_address TEXT,
-  
-  -- Service Selection
-  cocktail_style TEXT NOT NULL, -- 'classic', 'signature', 'mocktail', 'custom'
-  service_level TEXT NOT NULL CHECK (service_level IN ('self_service', 'bartender', 'full_experience')),
-  
-  -- Extras (stored as JSON array)
-  extras JSONB DEFAULT '[]'::jsonb,
-  
-  -- Pricing
-  base_price DECIMAL(10,2) NOT NULL,
-  per_person_price DECIMAL(10,2) NOT NULL,
-  extras_price DECIMAL(10,2) DEFAULT 0,
-  subtotal DECIMAL(10,2) NOT NULL,
-  tax DECIMAL(10,2) DEFAULT 0,
-  total_price DECIMAL(10,2) NOT NULL,
-  
-  -- Status
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'contacted', 'converted', 'declined', 'expired')),
-  
-  -- Notes
-  special_requests TEXT,
-  internal_notes TEXT
-);
-
--- ============================================
--- BOOKINGS TABLE
--- ============================================
-CREATE TABLE IF NOT EXISTS bookings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
-  -- Relations
-  quote_id UUID REFERENCES quotes(id) ON DELETE SET NULL,
-  customer_id UUID REFERENCES customers(id) ON DELETE CASCADE,
-  
-  -- Event Details
-  event_date DATE NOT NULL,
-  event_time TIME NOT NULL,
-  venue_name TEXT,
-  venue_address TEXT NOT NULL,
-  setup_time TIME NOT NULL,
-  event_duration INTEGER NOT NULL DEFAULT 4, -- hours
-  
-  -- Pricing
-  final_price DECIMAL(10,2) NOT NULL,
-  deposit_amount DECIMAL(10,2) NOT NULL,
-  deposit_paid BOOLEAN DEFAULT FALSE,
-  deposit_paid_date TIMESTAMP WITH TIME ZONE,
-  balance_paid BOOLEAN DEFAULT FALSE,
-  balance_paid_date TIMESTAMP WITH TIME ZONE,
-  
-  -- Status
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled')),
-  
-  -- Contract
-  contract_signed BOOLEAN DEFAULT FALSE,
-  contract_url TEXT,
-  
-  -- Notes
-  notes TEXT
-);
-
--- ============================================
--- COCKTAILS TABLE
--- ============================================
-CREATE TABLE IF NOT EXISTS cocktails (
+CREATE TABLE IF NOT EXISTS products (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
   -- Basic Info
   name TEXT NOT NULL,
-  name_en TEXT,
   description TEXT NOT NULL,
-  description_en TEXT,
-  
-  -- Details
-  ingredients JSONB NOT NULL DEFAULT '[]'::jsonb, -- Array of ingredient objects
-  category TEXT NOT NULL CHECK (category IN ('classic', 'signature', 'mocktail', 'seasonal')),
-  abv DECIMAL(4,2), -- Alcohol by volume percentage
+  category TEXT NOT NULL CHECK (category IN ('classic', 'signature', 'mocktail')),
   
   -- Pricing
-  base_cost DECIMAL(10,2) NOT NULL, -- Cost to make
-  price_per_can DECIMAL(10,2), -- If sold as canned cocktail
+  price_per_unit DECIMAL(10,2) NOT NULL,
+  bulk_price_12 DECIMAL(10,2), -- Price per unit when buying 12+
+  bulk_price_24 DECIMAL(10,2), -- Price per unit when buying 24+
   
-  -- Media
+  -- Product Details
+  alcohol_percentage DECIMAL(4,2), -- ABV percentage (NULL for mocktails)
+  ingredients JSONB NOT NULL DEFAULT '[]'::jsonb, -- Array of ingredient strings
+  flavor_profile TEXT[] DEFAULT ARRAY[]::TEXT[], -- Array: ['sweet', 'sour', 'bitter', 'fresh']
+  
+  -- Inventory
+  stock_quantity INTEGER DEFAULT 0,
+  is_available BOOLEAN DEFAULT TRUE,
+  
+  -- Visual
   image_url TEXT,
-  can_design_url TEXT,
+  can_color TEXT, -- Hex color code for can display
   
-  -- Availability
-  available BOOLEAN DEFAULT TRUE,
-  seasonal BOOLEAN DEFAULT FALSE,
-  season_start DATE,
-  season_end DATE,
-  
-  -- Popularity
-  popularity_score INTEGER DEFAULT 0,
-  times_ordered INTEGER DEFAULT 0
+  -- Popularity Tracking
+  times_ordered INTEGER DEFAULT 0,
+  popularity_score INTEGER DEFAULT 0
 );
 
 -- ============================================
--- CUSTOM CANS TABLE
+-- ORDERS TABLE (replaces quotes/bookings)
 -- ============================================
-CREATE TABLE IF NOT EXISTS custom_cans (
+CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
   -- Relations
-  customer_id UUID REFERENCES customers(id) ON DELETE CASCADE,
-  booking_id UUID REFERENCES bookings(id) ON DELETE SET NULL,
+  customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
+  order_number TEXT NOT NULL UNIQUE, -- Format: POPIT-XXXXXXXX
   
-  -- Design Data
-  design_data JSONB NOT NULL DEFAULT '{}'::jsonb, -- All 3D customizer settings
-  logo_url TEXT,
-  label_text TEXT NOT NULL,
-  color_scheme TEXT NOT NULL,
-  pattern TEXT,
+  -- Order Items (JSONB array of {product_id, quantity, price_at_purchase})
+  items JSONB NOT NULL DEFAULT '[]'::jsonb,
   
-  -- Cocktail Selection
-  cocktail_ids UUID[] DEFAULT ARRAY[]::UUID[], -- Array of cocktail IDs
-  custom_recipe JSONB, -- If custom cocktail
+  -- Customization Data (JSONB with label customization details)
+  customization_data JSONB DEFAULT '{}'::jsonb,
   
-  -- Order Details
-  quantity INTEGER NOT NULL CHECK (quantity >= 50),
-  price_per_unit DECIMAL(10,2) NOT NULL,
-  total_price DECIMAL(10,2) NOT NULL,
+  -- Pricing
+  subtotal DECIMAL(10,2) NOT NULL,
+  shipping DECIMAL(10,2) DEFAULT 0,
+  discount DECIMAL(10,2) DEFAULT 0,
+  discount_code TEXT,
+  total DECIMAL(10,2) NOT NULL,
+  
+  -- Delivery Information
+  delivery_address TEXT NOT NULL,
+  delivery_city TEXT DEFAULT 'CDMX',
+  delivery_postal_code TEXT,
+  delivery_date DATE,
+  delivery_instructions TEXT,
+  is_gift BOOLEAN DEFAULT FALSE,
+  gift_message TEXT,
   
   -- Status
-  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'pending_approval', 'approved', 'in_production', 'completed', 'delivered')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'shipped', 'delivered', 'cancelled')),
   
-  -- Production
-  production_notes TEXT,
-  estimated_delivery DATE,
-  actual_delivery DATE
+  -- Tracking
+  tracking_number TEXT,
+  shipped_at TIMESTAMP WITH TIME ZONE,
+  delivered_at TIMESTAMP WITH TIME ZONE,
+  
+  -- Payment
+  payment_method TEXT CHECK (payment_method IN ('card', 'oxxo', 'transfer', 'paypal', 'whatsapp')),
+  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'failed', 'refunded')),
+  
+  -- Notes
+  customer_notes TEXT,
+  internal_notes TEXT
 );
 
 -- ============================================
--- EVENTS TABLE (for portfolio/gallery)
+-- CART_SESSIONS TABLE
 -- ============================================
-CREATE TABLE IF NOT EXISTS events (
+CREATE TABLE IF NOT EXISTS cart_sessions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  -- Relations
-  booking_id UUID REFERENCES bookings(id) ON DELETE CASCADE,
+  -- Session identifier (can be user ID or anonymous session ID)
+  session_id TEXT NOT NULL,
   
-  -- Event Info
-  name TEXT NOT NULL,
-  type TEXT NOT NULL CHECK (type IN ('wedding', 'corporate', 'private', 'other')),
-  event_date DATE NOT NULL,
-  guest_count INTEGER,
+  -- Cart Items (JSONB array of {product_id, quantity})
+  items JSONB NOT NULL DEFAULT '[]'::jsonb,
   
-  -- Media
-  photo_urls JSONB DEFAULT '[]'::jsonb, -- Array of photo URLs
-  video_url TEXT,
-  featured_image_url TEXT,
+  -- Customization data if any
+  customization_data JSONB DEFAULT '{}'::jsonb,
   
-  -- Social Proof
-  testimonial TEXT,
-  testimonial_author TEXT,
-  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
-  
-  -- Display
-  featured BOOLEAN DEFAULT FALSE,
-  published BOOLEAN DEFAULT FALSE,
-  display_order INTEGER DEFAULT 0
+  -- Expires after 7 days of inactivity
+  expires_at TIMESTAMP WITH TIME ZONE DEFAULT (NOW() + INTERVAL '7 days')
 );
 
 -- ============================================
--- PRICING RULES TABLE (for dynamic pricing)
+-- DISCOUNT_CODES TABLE
 -- ============================================
-CREATE TABLE IF NOT EXISTS pricing_rules (
+CREATE TABLE IF NOT EXISTS discount_codes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  -- Rule Info
-  name TEXT NOT NULL,
-  description TEXT,
-  active BOOLEAN DEFAULT TRUE,
+  -- Code Info
+  code TEXT NOT NULL UNIQUE,
+  discount_percentage DECIMAL(5,2) NOT NULL CHECK (discount_percentage > 0 AND discount_percentage <= 100),
   
-  -- Pricing
-  service_type TEXT NOT NULL, -- 'mobile_bar', 'custom_cans', 'package'
-  base_price DECIMAL(10,2) NOT NULL,
-  per_person_min DECIMAL(10,2),
-  per_person_max DECIMAL(10,2),
+  -- Requirements
+  minimum_items INTEGER DEFAULT 0,
+  minimum_amount DECIMAL(10,2) DEFAULT 0,
   
-  -- Volume Discounts
-  volume_tiers JSONB DEFAULT '[]'::jsonb, -- Array of {min, max, price} objects
+  -- Validity
+  valid_from TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  valid_until TIMESTAMP WITH TIME ZONE,
   
-  -- Season/Date Multipliers
-  peak_season_multiplier DECIMAL(4,2) DEFAULT 1.0,
-  weekend_multiplier DECIMAL(4,2) DEFAULT 1.0,
+  -- Usage Limits
+  usage_limit INTEGER, -- NULL = unlimited
+  usage_count INTEGER DEFAULT 0,
   
-  -- Minimums
-  minimum_guests INTEGER,
-  minimum_order DECIMAL(10,2)
+  -- Status
+  is_active BOOLEAN DEFAULT TRUE,
+  
+  -- Restrictions
+  applicable_categories TEXT[], -- NULL = all categories
+  first_time_only BOOLEAN DEFAULT FALSE,
+  
+  -- Description
+  description TEXT
 );
 
 -- ============================================
 -- INDEXES for Performance
 -- ============================================
-CREATE INDEX IF NOT EXISTS idx_quotes_customer_email ON quotes(customer_email);
-CREATE INDEX IF NOT EXISTS idx_quotes_status ON quotes(status);
-CREATE INDEX IF NOT EXISTS idx_quotes_event_date ON quotes(event_date);
-CREATE INDEX IF NOT EXISTS idx_bookings_event_date ON bookings(event_date);
-CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
-CREATE INDEX IF NOT EXISTS idx_cocktails_category ON cocktails(category);
-CREATE INDEX IF NOT EXISTS idx_cocktails_available ON cocktails(available);
-CREATE INDEX IF NOT EXISTS idx_events_featured ON events(featured);
-CREATE INDEX IF NOT EXISTS idx_events_published ON events(published);
+CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+CREATE INDEX IF NOT EXISTS idx_products_available ON products(is_available);
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_order_number ON orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_delivery_date ON orders(delivery_date);
+CREATE INDEX IF NOT EXISTS idx_cart_sessions_session_id ON cart_sessions(session_id);
+CREATE INDEX IF NOT EXISTS idx_cart_sessions_expires_at ON cart_sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_discount_codes_code ON discount_codes(code);
+CREATE INDEX IF NOT EXISTS idx_discount_codes_active ON discount_codes(is_active);
 
 -- ============================================
 -- ROW LEVEL SECURITY (RLS)
 -- ============================================
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE quotes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cocktails ENABLE ROW LEVEL SECURITY;
-ALTER TABLE custom_cans ENABLE ROW LEVEL SECURITY;
-ALTER TABLE events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE pricing_rules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cart_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE discount_codes ENABLE ROW LEVEL SECURITY;
 
--- Public read access for cocktails and published events
-CREATE POLICY "Public can view available cocktails" ON cocktails FOR SELECT USING (available = true);
-CREATE POLICY "Public can view published events" ON events FOR SELECT USING (published = true);
+-- Public read access for available products
+CREATE POLICY "Public can view available products" ON products FOR SELECT USING (is_available = true);
 
--- Customers can view their own data
-CREATE POLICY "Customers can view own quotes" ON quotes FOR SELECT USING (auth.uid()::text = customer_id::text);
-CREATE POLICY "Customers can insert quotes" ON quotes FOR INSERT WITH CHECK (true);
+-- Public read access for active discount codes
+CREATE POLICY "Public can view active discount codes" ON discount_codes FOR SELECT USING (is_active = true AND (valid_until IS NULL OR valid_until > NOW()));
+
+-- Customers can view their own orders
+CREATE POLICY "Customers can view own orders" ON orders FOR SELECT USING (
+  auth.uid()::text = customer_id::text OR
+  customer_id IN (SELECT id FROM customers WHERE email = auth.jwt() ->> 'email')
+);
+
+-- Customers can insert orders
+CREATE POLICY "Customers can insert orders" ON orders FOR INSERT WITH CHECK (true);
+
+-- Cart sessions are user-specific
+CREATE POLICY "Users can manage own cart sessions" ON cart_sessions FOR ALL USING (
+  session_id = auth.uid()::text OR
+  session_id = (SELECT id::text FROM customers WHERE email = auth.jwt() ->> 'email')
+);
 
 -- ============================================
 -- FUNCTIONS
@@ -285,38 +222,146 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Function to generate order number
+CREATE OR REPLACE FUNCTION generate_order_number()
+RETURNS TEXT AS $$
+BEGIN
+  RETURN 'POPIT-' || UPPER(SUBSTRING(MD5(RANDOM()::TEXT || NOW()::TEXT) FROM 1 FOR 8));
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to check and apply discount code
+CREATE OR REPLACE FUNCTION validate_discount_code(
+  p_code TEXT,
+  p_item_count INTEGER,
+  p_subtotal DECIMAL
+)
+RETURNS TABLE (
+  valid BOOLEAN,
+  discount_percentage DECIMAL,
+  discount_amount DECIMAL,
+  message TEXT
+) AS $$
+DECLARE
+  v_discount discount_codes%ROWTYPE;
+BEGIN
+  SELECT * INTO v_discount
+  FROM discount_codes
+  WHERE code = UPPER(p_code)
+    AND is_active = true
+    AND (valid_until IS NULL OR valid_until > NOW())
+    AND (usage_limit IS NULL OR usage_count < usage_limit);
+  
+  IF NOT FOUND THEN
+    RETURN QUERY SELECT false, 0::DECIMAL, 0::DECIMAL, 'Código inválido o expirado'::TEXT;
+    RETURN;
+  END IF;
+  
+  IF p_item_count < v_discount.minimum_items THEN
+    RETURN QUERY SELECT false, 0::DECIMAL, 0::DECIMAL, 
+      format('Mínimo %s latas requeridas', v_discount.minimum_items)::TEXT;
+    RETURN;
+  END IF;
+  
+  IF p_subtotal < v_discount.minimum_amount THEN
+    RETURN QUERY SELECT false, 0::DECIMAL, 0::DECIMAL,
+      format('Monto mínimo: $%s', v_discount.minimum_amount)::TEXT;
+    RETURN;
+  END IF;
+  
+  RETURN QUERY SELECT 
+    true,
+    v_discount.discount_percentage,
+    (p_subtotal * v_discount.discount_percentage / 100)::DECIMAL,
+    'Descuento aplicado'::TEXT;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Drop existing triggers if they exist, then create new ones
+DROP TRIGGER IF EXISTS update_customers_updated_at ON customers;
+DROP TRIGGER IF EXISTS update_products_updated_at ON products;
+DROP TRIGGER IF EXISTS update_orders_updated_at ON orders;
+DROP TRIGGER IF EXISTS update_cart_sessions_updated_at ON cart_sessions;
+DROP TRIGGER IF EXISTS update_discount_codes_updated_at ON discount_codes;
+DROP TRIGGER IF EXISTS set_order_number_trigger ON orders;
+DROP TRIGGER IF EXISTS increment_discount_usage_trigger ON orders;
+
+-- Drop existing triggers if they exist (for idempotent schema updates)
+DROP TRIGGER IF EXISTS update_customers_updated_at ON customers;
+DROP TRIGGER IF EXISTS update_products_updated_at ON products;
+DROP TRIGGER IF EXISTS update_orders_updated_at ON orders;
+DROP TRIGGER IF EXISTS update_cart_sessions_updated_at ON cart_sessions;
+DROP TRIGGER IF EXISTS update_discount_codes_updated_at ON discount_codes;
+DROP TRIGGER IF EXISTS set_order_number_trigger ON orders;
+DROP TRIGGER IF EXISTS increment_discount_usage_trigger ON orders;
+
 -- Add triggers to all tables
 CREATE TRIGGER update_customers_updated_at BEFORE UPDATE ON customers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_quotes_updated_at BEFORE UPDATE ON quotes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_bookings_updated_at BEFORE UPDATE ON bookings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_cocktails_updated_at BEFORE UPDATE ON cocktails FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_custom_cans_updated_at BEFORE UPDATE ON custom_cans FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_events_updated_at BEFORE UPDATE ON events FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_cart_sessions_updated_at BEFORE UPDATE ON cart_sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_discount_codes_updated_at BEFORE UPDATE ON discount_codes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Trigger to auto-generate order number
+CREATE OR REPLACE FUNCTION set_order_number()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.order_number IS NULL OR NEW.order_number = '' THEN
+    NEW.order_number := generate_order_number();
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_order_number_trigger BEFORE INSERT ON orders FOR EACH ROW EXECUTE FUNCTION set_order_number();
+
+-- Trigger to increment discount code usage
+CREATE OR REPLACE FUNCTION increment_discount_usage()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.discount_code IS NOT NULL AND NEW.status = 'confirmed' THEN
+    UPDATE discount_codes
+    SET usage_count = usage_count + 1
+    WHERE code = NEW.discount_code;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increment_discount_usage_trigger AFTER UPDATE ON orders FOR EACH ROW 
+  WHEN (OLD.status != 'confirmed' AND NEW.status = 'confirmed')
+  EXECUTE FUNCTION increment_discount_usage();
 
 -- ============================================
--- SEED DATA - Initial Pricing Rules
+-- SEED DATA - Products
 -- ============================================
-INSERT INTO pricing_rules (name, description, service_type, base_price, per_person_min, per_person_max, minimum_guests, active) VALUES
-('Mobile Bar - Wedding Package', 'Premium mobile bar service for weddings', 'mobile_bar', 12000.00, 300.00, 450.00, 30, true),
-('Mobile Bar - Corporate Event', 'Professional bar service for corporate events', 'mobile_bar', 10000.00, 250.00, 400.00, 20, true),
-('Mobile Bar - Private Party', 'Fun bar service for private celebrations', 'mobile_bar', 8000.00, 280.00, 420.00, 15, true),
-('Custom Cans - Standard', 'Custom branded cocktail cans', 'custom_cans', 0.00, 0.00, 0.00, 50, true);
+INSERT INTO products (name, description, category, price_per_unit, bulk_price_12, bulk_price_24, alcohol_percentage, ingredients, flavor_profile, can_color, stock_quantity, is_available) VALUES
+('Margarita Clásica', 'Tequila blanco, triple sec, jugo de limón fresco, sal de mar', 'classic', 95.00, 85.50, 80.75, 15.00, '["Tequila blanco", "Triple sec", "Limón", "Sal de mar"]'::jsonb, ARRAY['sour', 'fresh'], '#f7e7ce', 1000, true),
+('Mojito Premium', 'Ron blanco, menta fresca, lima, azúcar de caña, agua mineral', 'classic', 95.00, 85.50, 80.75, 12.00, '["Ron blanco", "Menta fresca", "Lima", "Azúcar orgánica"]'::jsonb, ARRAY['fresh', 'sweet'], '#a8e6cf', 1000, true),
+('Old Fashioned', 'Whiskey, azúcar, bitters de angostura, naranja', 'classic', 110.00, 99.00, 93.50, 18.00, '["Whiskey", "Azúcar", "Bitters", "Naranja"]'::jsonb, ARRAY['bitter', 'sweet'], '#d4af37', 500, true),
+('Paloma Mexicana', 'Tequila reposado, Jarritos de toronja, limón, sal con chile', 'signature', 100.00, 90.00, 85.00, 14.00, '["Tequila reposado", "Jarritos toronja", "Limón", "Chile piquín"]'::jsonb, ARRAY['sour', 'fresh'], '#ffd3b6', 800, true),
+('Mezcalita de Jamaica', 'Mezcal artesanal, té de flor de jamaica, menta, limón', 'signature', 100.00, 90.00, 85.00, 13.00, '["Mezcal", "Jamaica", "Menta", "Limón"]'::jsonb, ARRAY['sour', 'fresh'], '#c44569', 600, true),
+('Mezcal Sunrise', 'Mezcal artesanal, jugo de naranja, granadina, chile', 'signature', 115.00, 103.50, 97.75, 16.00, '["Mezcal", "Naranja natural", "Granadina", "Chile morita"]'::jsonb, ARRAY['sweet', 'fresh'], '#ffaaa5', 600, true),
+('St. Germain Spritz', 'St. Germain, prosecco, soda, limón', 'signature', 110.00, 99.00, 93.50, 11.00, '["St. Germain", "Prosecco", "Soda", "Limón"]'::jsonb, ARRAY['sweet', 'fresh'], '#ffeaa7', 400, true),
+('Agua Fresca Tropical', 'Piña, mango, limón, menta, agua mineral', 'mocktail', 75.00, 67.50, 63.75, NULL, '["Piña", "Mango", "Limón", "Menta", "Agua mineral"]'::jsonb, ARRAY['sweet', 'fresh'], '#ffeaa7', 800, true),
+('Virgin Mojito de Fresa', 'Fresas frescas, menta, lima, jarabe de agave, soda', 'mocktail', 75.00, 67.50, 63.75, NULL, '["Fresas", "Menta", "Lima", "Agave", "Soda"]'::jsonb, ARRAY['sweet', 'fresh'], '#fd79a8', 800, true),
+('Limonada de Lavanda', 'Limones frescos, jarabe de lavanda, agua con gas', 'mocktail', 75.00, 67.50, 63.75, NULL, '["Limón", "Lavanda", "Agave", "Agua con gas"]'::jsonb, ARRAY['sour', 'fresh'], '#a29bfe', 600, true)
+ON CONFLICT DO NOTHING;
 
 -- ============================================
--- SEED DATA - Sample Cocktails
+-- SEED DATA - Discount Codes
 -- ============================================
-INSERT INTO cocktails (name, name_en, description, description_en, category, ingredients, base_cost, price_per_can, available) VALUES
-('Margarita Clásica', 'Classic Margarita', 'Tequila, triple sec, jugo de limón, sal en el borde', 'Tequila, triple sec, lime juice, salt rim', 'classic', '["Tequila blanco", "Triple sec", "Jugo de limón", "Sal"]'::jsonb, 45.00, 95.00, true),
-('Paloma Mexicana', 'Mexican Paloma', 'Tequila, refresco de toronja, limón, sal', 'Tequila, grapefruit soda, lime, salt', 'signature', '["Tequila blanco", "Jarritos toronja", "Limón", "Sal"]'::jsonb, 40.00, 90.00, true),
-('Mojito de Jamaica', 'Hibiscus Mojito', 'Ron, té de jamaica, menta, limón, soda', 'Rum, hibiscus tea, mint, lime, soda', 'signature', '["Ron blanco", "Té de jamaica", "Menta", "Limón", "Agua mineral"]'::jsonb, 42.00, 92.00, true),
-('Espresso Martini', 'Espresso Martini', 'Vodka, licor de café, espresso, jarabe simple', 'Vodka, coffee liqueur, espresso, simple syrup', 'classic', '["Vodka", "Kahlúa", "Espresso", "Jarabe simple"]'::jsonb, 55.00, 110.00, true),
-('Agua Fresca Tropical', 'Tropical Agua Fresca', 'Jugo de piña, mango, limón, menta (sin alcohol)', 'Pineapple juice, mango, lime, mint (non-alcoholic)', 'mocktail', '["Piña", "Mango", "Limón", "Menta", "Agua mineral"]'::jsonb, 25.00, 60.00, true);
+INSERT INTO discount_codes (code, discount_percentage, minimum_items, valid_from, valid_until, usage_limit, description) VALUES
+('POPITEVERYWHERE', 10.00, 6, NOW(), NULL, NULL, '10% OFF para primera vez - Mínimo 6 latas'),
+('EARLYBIRD', 5.00, 0, NOW(), NULL, NULL, '5% OFF para pedidos antes de las 12pm'),
+('SHARE10', 10.00, 0, NOW(), NULL, NULL, '10% OFF tu próximo pedido si compartes')
+ON CONFLICT (code) DO NOTHING;
 
-COMMENT ON TABLE quotes IS 'Customer quote requests and pricing calculations';
-COMMENT ON TABLE bookings IS 'Confirmed event bookings';
-COMMENT ON TABLE customers IS 'Customer contact information';
-COMMENT ON TABLE cocktails IS 'Cocktail menu and recipes';
-COMMENT ON TABLE custom_cans IS 'Custom branded can orders';
-COMMENT ON TABLE events IS 'Past events for portfolio/gallery';
-COMMENT ON TABLE pricing_rules IS 'Dynamic pricing rules and tiers';
-
+-- ============================================
+-- COMMENTS
+-- ============================================
+COMMENT ON TABLE customers IS 'Customer information and delivery addresses';
+COMMENT ON TABLE products IS 'Canned cocktail products with pricing tiers';
+COMMENT ON TABLE orders IS 'Customer orders for canned cocktails';
+COMMENT ON TABLE cart_sessions IS 'Shopping cart sessions (persisted for 7 days)';
+COMMENT ON TABLE discount_codes IS 'Discount codes and promotional offers';

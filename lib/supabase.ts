@@ -5,98 +5,119 @@ import { createClient } from '@supabase/supabase-js';
 export type Database = {
   public: {
     Tables: {
-      quotes: {
-        Row: {
-          id: string;
-          created_at: string;
-          event_type: string;
-          guest_count: number;
-          date: string;
-          cocktail_style: string;
-          service_level: string;
-          extras: string[];
-          estimated_price: number;
-          customer_name: string;
-          customer_email: string;
-          customer_phone: string;
-          status: 'pending' | 'contacted' | 'confirmed' | 'completed';
-        };
-        Insert: Omit<Database['public']['Tables']['quotes']['Row'], 'id' | 'created_at'>;
-        Update: Partial<Database['public']['Tables']['quotes']['Insert']>;
-      };
-      bookings: {
-        Row: {
-          id: string;
-          created_at: string;
-          quote_id: string;
-          event_date: string;
-          venue_address: string;
-          setup_time: string;
-          event_duration: number;
-          final_price: number;
-          deposit_paid: boolean;
-          deposit_amount: number;
-          status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
-        };
-        Insert: Omit<Database['public']['Tables']['bookings']['Row'], 'id' | 'created_at'>;
-        Update: Partial<Database['public']['Tables']['bookings']['Insert']>;
-      };
       customers: {
         Row: {
           id: string;
           created_at: string;
+          updated_at: string;
           name: string;
           email: string;
           phone: string;
-          company?: string;
+          delivery_address?: string;
+          city?: string;
+          postal_code?: string;
           notes?: string;
         };
-        Insert: Omit<Database['public']['Tables']['customers']['Row'], 'id' | 'created_at'>;
+        Insert: Omit<Database['public']['Tables']['customers']['Row'], 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['customers']['Insert']>;
       };
-      cocktails: {
+      products: {
         Row: {
           id: string;
+          created_at: string;
+          updated_at: string;
           name: string;
-          name_en: string;
           description: string;
-          description_en: string;
-          ingredients: string[];
           category: 'classic' | 'signature' | 'mocktail';
+          price_per_unit: number;
+          bulk_price_12?: number;
+          bulk_price_24?: number;
+          alcohol_percentage?: number;
+          ingredients: string[];
+          flavor_profile: string[];
+          stock_quantity: number;
+          is_available: boolean;
           image_url?: string;
-          available: boolean;
+          can_color?: string;
+          times_ordered: number;
+          popularity_score: number;
         };
-        Insert: Omit<Database['public']['Tables']['cocktails']['Row'], 'id'>;
-        Update: Partial<Database['public']['Tables']['cocktails']['Insert']>;
+        Insert: Omit<Database['public']['Tables']['products']['Row'], 'id' | 'created_at' | 'updated_at' | 'times_ordered' | 'popularity_score'>;
+        Update: Partial<Database['public']['Tables']['products']['Insert']>;
       };
-      custom_cans: {
+      orders: {
         Row: {
           id: string;
           created_at: string;
-          customer_id: string;
-          design_data: Record<string, any>;
-          logo_url?: string;
-          label_text: string;
-          color_scheme: string;
-          quantity: number;
-          status: 'draft' | 'approved' | 'in_production' | 'completed';
+          updated_at: string;
+          customer_id?: string;
+          order_number: string;
+          items: Array<{
+            product_id: string;
+            quantity: number;
+            price_at_purchase: number;
+          }>;
+          customization_data?: Record<string, any>;
+          subtotal: number;
+          shipping: number;
+          discount: number;
+          discount_code?: string;
+          total: number;
+          delivery_address: string;
+          delivery_city?: string;
+          delivery_postal_code?: string;
+          delivery_date?: string;
+          delivery_instructions?: string;
+          is_gift: boolean;
+          gift_message?: string;
+          status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+          tracking_number?: string;
+          shipped_at?: string;
+          delivered_at?: string;
+          payment_method?: 'card' | 'oxxo' | 'transfer' | 'paypal' | 'whatsapp';
+          payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+          customer_notes?: string;
+          internal_notes?: string;
         };
-        Insert: Omit<Database['public']['Tables']['custom_cans']['Row'], 'id' | 'created_at'>;
-        Update: Partial<Database['public']['Tables']['custom_cans']['Insert']>;
+        Insert: Omit<Database['public']['Tables']['orders']['Row'], 'id' | 'created_at' | 'updated_at' | 'order_number'>;
+        Update: Partial<Database['public']['Tables']['orders']['Insert']>;
       };
-      events: {
+      cart_sessions: {
         Row: {
           id: string;
           created_at: string;
-          booking_id: string;
-          name: string;
-          type: 'wedding' | 'corporate' | 'private' | 'other';
-          photo_urls: string[];
-          testimonial?: string;
-          featured: boolean;
+          updated_at: string;
+          session_id: string;
+          items: Array<{
+            product_id: string;
+            quantity: number;
+          }>;
+          customization_data?: Record<string, any>;
+          expires_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['events']['Row'], 'id' | 'created_at'>;
-        Update: Partial<Database['public']['Tables']['events']['Insert']>;
+        Insert: Omit<Database['public']['Tables']['cart_sessions']['Row'], 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Database['public']['Tables']['cart_sessions']['Insert']>;
+      };
+      discount_codes: {
+        Row: {
+          id: string;
+          created_at: string;
+          updated_at: string;
+          code: string;
+          discount_percentage: number;
+          minimum_items: number;
+          minimum_amount: number;
+          valid_from: string;
+          valid_until?: string;
+          usage_limit?: number;
+          usage_count: number;
+          is_active: boolean;
+          applicable_categories?: string[];
+          first_time_only: boolean;
+          description?: string;
+        };
+        Insert: Omit<Database['public']['Tables']['discount_codes']['Row'], 'id' | 'created_at' | 'updated_at' | 'usage_count'>;
+        Update: Partial<Database['public']['Tables']['discount_codes']['Insert']>;
       };
     };
   };
@@ -125,31 +146,94 @@ export const supabase = createClient<Database>(
 );
 
 // Helper functions for common operations
-export const insertQuote = async (quote: Database['public']['Tables']['quotes']['Insert']) => {
-  const { data, error } = await supabase.from('quotes').insert(quote).select().single();
+export const insertOrder = async (order: Database['public']['Tables']['orders']['Insert']) => {
+  const { data, error } = await supabase.from('orders').insert(order).select().single();
   
   if (error) throw error;
   return data;
 };
 
-export const getAvailableCocktails = async () => {
+export const getAvailableProducts = async () => {
   const { data, error } = await supabase
-    .from('cocktails')
+    .from('products')
     .select('*')
-    .eq('available', true);
+    .eq('is_available', true)
+    .order('popularity_score', { ascending: false });
   
   if (error) throw error;
   return data;
 };
 
-export const checkAvailability = async (date: string) => {
+export const getProductById = async (id: string) => {
   const { data, error } = await supabase
-    .from('bookings')
-    .select('event_date')
-    .eq('event_date', date)
-    .in('status', ['confirmed', 'in_progress']);
+    .from('products')
+    .select('*')
+    .eq('id', id)
+    .single();
   
   if (error) throw error;
-  return data.length === 0; // Returns true if date is available
+  return data;
 };
 
+export const validateDiscountCode = async (code: string, itemCount: number, subtotal: number) => {
+  const { data, error } = await supabase.rpc('validate_discount_code', {
+    p_code: code.toUpperCase(),
+    p_item_count: itemCount,
+    p_subtotal: subtotal,
+  });
+  
+  if (error) throw error;
+  return data?.[0] || { valid: false, discount_percentage: 0, discount_amount: 0, message: 'Error validating code' };
+};
+
+export const saveCartSession = async (sessionId: string, items: any[], customizationData?: any) => {
+  const { data, error } = await supabase
+    .from('cart_sessions')
+    .upsert({
+      session_id: sessionId,
+      items,
+      customization_data: customizationData || {},
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    }, {
+      onConflict: 'session_id',
+    })
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+};
+
+export const getCartSession = async (sessionId: string) => {
+  const { data, error } = await supabase
+    .from('cart_sessions')
+    .select('*')
+    .eq('session_id', sessionId)
+    .gt('expires_at', new Date().toISOString())
+    .single();
+  
+  if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
+  return data;
+};
+
+export const getCustomerOrders = async (customerId: string) => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('customer_id', customerId)
+    .order('created_at', { ascending: false });
+  
+  if (error) throw error;
+  return data;
+};
+
+export const getOrderByNumber = async (orderNumber: string) => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('order_number', orderNumber)
+    .single();
+  
+  if (error) throw error;
+  return data;
+};
