@@ -2,18 +2,16 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 
 export default function Hero() {
   const [hoveredCan, setHoveredCan] = useState<number | null>(null);
 
   const flavors = [
-    { name: 'Margarita Clásica', color: '#f7e7ce' },
-    { name: 'Mojito Premium', color: '#a8e6cf' },
-    { name: 'Paloma Mexicana', color: '#ffd3b6' },
-    { name: 'Mezcal Sunrise', color: '#ffaaa5' },
-    { name: 'Old Fashioned', color: '#d4af37' },
-    { name: 'Mojito de Jamaica', color: '#c44569' },
+    { name: 'Margarita Clásica', image: '/images/popit1.png' },
+    { name: 'Mojito Premium', image: '/images/popit2.png' },
+    { name: 'Paloma Mexicana', image: '/images/popit3.png' },
   ];
 
   const textVariants = {
@@ -84,12 +82,9 @@ export default function Hero() {
       {/* Floating Clickable Cans */}
       {flavors.map((flavor, index) => {
         const positions = [
-          { top: '15%', left: '10%' },
-          { top: '25%', right: '15%' },
-          { top: '60%', left: '8%' },
-          { top: '70%', right: '12%' },
-          { top: '40%', left: '5%' },
-          { top: '50%', right: '8%' },
+          { top: '20%', left: '10%' },
+          { top: '50%', right: '12%' },
+          { top: '70%', left: '8%' },
         ];
         const pos = positions[index % positions.length];
 
@@ -106,34 +101,48 @@ export default function Hero() {
             onClick={() => window.location.href = '/cocteles'}
           >
             <div className="relative">
-              {/* Can Image/Shape */}
-              <div 
-                className="w-16 h-24 md:w-20 md:h-28 rounded-t-lg rounded-b-sm transition-all duration-300 shadow-lg"
+              {/* Can Image */}
+              <motion.div
+                className="relative w-20 h-28 md:w-24 md:h-32 transition-all duration-300"
+                animate={{
+                  scale: hoveredCan === index ? 1.15 : 1,
+                }}
                 style={{
-                  backgroundColor: flavor.color,
-                  border: hoveredCan === index ? '2px solid #d4af37' : '1px solid rgba(212, 175, 55, 0.3)',
-                  boxShadow: hoveredCan === index 
-                    ? '0 8px 32px rgba(212, 175, 55, 0.4), 0 0 0 2px rgba(212, 175, 55, 0.2)' 
-                    : '0 4px 16px rgba(0, 0, 0, 0.3)',
-                  transform: hoveredCan === index ? 'scale(1.15)' : 'scale(1)',
+                  filter: hoveredCan === index 
+                    ? 'drop-shadow(0 8px 32px rgba(212, 175, 55, 0.6))' 
+                    : 'drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4))',
                 }}
               >
-                {/* Can Top */}
-                <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-gray-300 to-gray-400 rounded-t-lg"></div>
-                {/* Can Label Area */}
-                <div className="absolute top-4 left-1 right-1 bottom-2 flex items-center justify-center">
-                  <span className="text-[8px] md:text-[10px] font-bold text-deep-black text-center px-1">
-                    POPIT
-                  </span>
-                </div>
-              </div>
+                <Image
+                  src={flavor.image}
+                  alt={flavor.name}
+                  width={96}
+                  height={128}
+                  className="object-contain w-full h-full"
+                  style={{
+                    transform: hoveredCan === index ? 'rotate(5deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.3s ease',
+                  }}
+                />
+                {/* Gold border on hover */}
+                {hoveredCan === index && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="absolute inset-0 border-2 border-rich-gold rounded-lg pointer-events-none"
+                    style={{
+                      boxShadow: '0 0 0 2px rgba(212, 175, 55, 0.3)',
+                    }}
+                  />
+                )}
+              </motion.div>
 
               {/* Flavor Tooltip */}
               {hoveredCan === index && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-rich-gold text-deep-black text-xs font-bold rounded shadow-lg border border-rich-gold/50"
+                  className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 whitespace-nowrap px-3 py-1 bg-rich-gold text-deep-black text-xs font-bold rounded shadow-lg border border-rich-gold/50 z-30"
                 >
                   {flavor.name}
                 </motion.div>
@@ -213,7 +222,7 @@ export default function Hero() {
           >
             {/* Primary CTA */}
             <Link
-              href="#personalizar"
+              href="/productos"
               className="group relative px-10 py-4 border-2 border-rich-gold text-champagne font-montserrat font-medium text-lg tracking-wider uppercase overflow-hidden transition-all duration-500 hover:text-deep-black shadow-lg hover:shadow-rich-gold/50"
             >
               <span className="relative z-10">Arma tu Pack</span>
