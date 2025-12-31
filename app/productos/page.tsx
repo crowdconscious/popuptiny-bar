@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '../components/sections/Navigation';
 import WhatsAppButton from '../components/ui/WhatsAppButton';
+import { useCart } from '../context/CartContext';
 
 interface Cocktail {
   id: string;
@@ -89,13 +90,12 @@ const FEATURED_PACKS = [
 ];
 
 export default function ProductosPage() {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const { cart, addToCart: addToCartContext, updateQuantity: updateQuantityContext, totalCans } = useCart();
   const [customLabels, setCustomLabels] = useState(false);
   const [fizzAnimations, setFizzAnimations] = useState<number[]>([]);
   const [celebrating, setCelebrating] = useState(false);
   const [shaking, setShaking] = useState(false);
 
-  const totalCans = cart.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = totalCans >= 24 ? 0 : 150;
   const customLabelFee = customLabels ? totalCans * 15 : 0;
@@ -105,21 +105,16 @@ export default function ProductosPage() {
     setShaking(true);
     setTimeout(() => setShaking(false), 500);
 
-    const existingItem = cart.find(item => item.id === cocktail.id);
-    
-    if (existingItem) {
-      setCart(cart.map(item =>
-        item.id === cocktail.id
-          ? { ...item, quantity: item.quantity + quantity }
-          : item
-      ));
-    } else {
-      setCart([...cart, { ...cocktail, quantity }]);
-    }
+    addToCartContext({
+      id: cocktail.id,
+      name: cocktail.name,
+      price: cocktail.price,
+      quantity,
+    });
 
     // Fizz animation
     const timestamp = Date.now();
-    setFizzAnimations([...fizzAnimations, timestamp]);
+    setFizzAnimations(prev => [...prev, timestamp]);
     setTimeout(() => {
       setFizzAnimations(prev => prev.filter(t => t !== timestamp));
     }, 600);
@@ -138,16 +133,7 @@ export default function ProductosPage() {
   };
 
   const updateQuantity = (id: string, delta: number) => {
-    setCart(cart.map(item => {
-      if (item.id === id) {
-        const newQty = Math.max(0, item.quantity + delta);
-        if (newQty === 0) {
-          return null as any;
-        }
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    }).filter(Boolean));
+    updateQuantityContext(id, delta);
   };
 
   const addPack = (pack: typeof FEATURED_PACKS[0]) => {
@@ -168,7 +154,7 @@ export default function ProductosPage() {
     <>
       <Navigation />
       
-      <main className="min-h-screen bg-background pt-24">
+      <main className="min-h-screen bg-background pt-32">
         {/* Header */}
         <section className="py-12 px-6 bg-gradient-to-br from-rich-gold/10 via-background to-copper/10 border-b border-rich-gold/20">
           <div className="max-w-7xl mx-auto text-center">

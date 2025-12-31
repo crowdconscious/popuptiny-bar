@@ -93,7 +93,7 @@ export default function CoctelesPage() {
     <>
       <Navigation />
       
-      <main className="min-h-screen bg-background pt-24">
+      <main className="min-h-screen bg-background pt-32">
         {/* Hero Section */}
         <section className="py-20 px-6 bg-gradient-to-br from-mint/10 via-background to-coral/10">
           <div className="max-w-7xl mx-auto text-center">
@@ -185,10 +185,10 @@ export default function CoctelesPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="#cotizador"
+                href="/productos"
                 className="px-8 py-4 bg-coral text-white font-bold text-lg rounded-full hover:bg-coral/90 transition-colors shadow-xl"
               >
-                Personalizar Menú
+                Arma tu Pack
               </a>
               <a
                 href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5215512345678'}?text=${encodeURIComponent('¡Hola! Me gustaría crear un menú personalizado de cocktails')}`}

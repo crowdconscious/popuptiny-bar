@@ -12,7 +12,7 @@ export default function NosotrosPage() {
     <>
       <Navigation />
       
-      <main className="min-h-screen bg-background pt-24">
+      <main className="min-h-screen bg-background pt-32">
         {/* Hero Section */}
         <section className="py-20 px-6 bg-gradient-to-br from-coral/10 via-background to-mint/10">
           <div className="max-w-4xl mx-auto text-center">

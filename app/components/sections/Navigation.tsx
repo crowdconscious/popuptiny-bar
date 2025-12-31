@@ -3,11 +3,13 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useCart } from '../../context/CartContext';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { scrollY } = useScroll();
+  const { totalCans } = useCart();
   
   const logoScale = useTransform(scrollY, [0, 100], [1, 0.85]);
   const headerBg = useTransform(
@@ -25,12 +27,11 @@ export default function Navigation() {
   }, []);
 
   const menuItems = [
-    { name: 'Servicios', href: '#servicios' },
+    { name: 'Productos', href: '/productos' },
     { name: 'Personalizar', href: '#personalizar' },
-    { name: 'Cocktails', href: '/cocteles' },
-    { name: 'Galería', href: '/galeria' },
+    { name: 'Packs Especiales', href: '/productos#packs' },
     { name: 'Nosotros', href: '/nosotros' },
-    { name: 'Cotizador', href: '#cotizador' },
+    { name: 'Mi Carrito', href: '/productos', badge: totalCans },
   ];
 
   const menuVariants = {
@@ -65,11 +66,19 @@ export default function Navigation() {
 
   return (
     <>
+      {/* Header Banner */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-rich-gold text-deep-black text-center py-2 px-4 text-sm font-montserrat font-bold">
+        🎉 Envío gratis en pedidos +24 latas 🎉
+      </div>
+
       <motion.header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled ? 'shadow-2xl backdrop-blur-xl border-b border-rich-gold/10' : ''
         }`}
-        style={{ backgroundColor: headerBg }}
+        style={{ 
+          backgroundColor: headerBg,
+          top: '32px',
+        }}
       >
         <nav className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
@@ -98,6 +107,11 @@ export default function Navigation() {
                   className="relative font-montserrat text-sm text-champagne/80 hover:text-rich-gold uppercase tracking-wider transition-colors duration-300 group"
                 >
                   {item.name}
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="absolute -top-2 -right-4 bg-rich-gold text-deep-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {item.badge}
+                    </span>
+                  )}
                   <span className="absolute -bottom-1 left-0 w-0 h-px bg-rich-gold group-hover:w-full transition-all duration-300"></span>
                 </Link>
               ))}
@@ -172,7 +186,7 @@ export default function Navigation() {
         variants={menuVariants}
         className="fixed top-0 right-0 bottom-0 w-full sm:w-96 bg-midnight-navy z-40 lg:hidden shadow-2xl"
       >
-        <div className="flex flex-col h-full pt-24 px-8 pb-8">
+        <div className="flex flex-col h-full pt-32 px-8 pb-8">
           <nav className="flex-1 flex flex-col gap-6">
             {menuItems.map((item, i) => (
               <motion.div
@@ -183,9 +197,14 @@ export default function Navigation() {
                 <Link
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="block font-serif text-3xl text-champagne hover:text-rich-gold transition-colors duration-300 py-2 border-b border-rich-gold/10 hover:border-rich-gold/30"
+                  className="block font-serif text-3xl text-champagne hover:text-rich-gold transition-colors duration-300 py-2 border-b border-rich-gold/10 hover:border-rich-gold/30 relative"
                 >
                   {item.name}
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="ml-3 inline-block bg-rich-gold text-deep-black text-sm font-bold rounded-full px-2 py-0.5">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               </motion.div>
             ))}
